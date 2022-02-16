@@ -14,9 +14,6 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/domarm-comat/crawlMpGui",
     packages=setuptools.find_packages(),
-    package_data={'crawlMpGui.resources': ['*.*'],
-                  'crawlMpGui.templates': ['*.*']},
-    scripts=['crawlMpGui/scripts/search_fs_mp_gui'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
