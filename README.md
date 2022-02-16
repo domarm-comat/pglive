@@ -1,0 +1,2 @@
+# pglive
+Live pyqtgraph plot
