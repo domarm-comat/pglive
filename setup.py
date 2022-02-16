@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pglive",
-    version="0.1.0",
+    version="0.1.1",
     license='MIT',
     author="Martin Domaracký",
     author_email="domarm@comat.sk",
     description="Pyqtgraph live plot",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/domarm-comat/crawlMpGui",
+    url="https://github.com/domarm-comat/pglive",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
