@@ -1,11 +1,11 @@
 # Live pyqtgraph plot
 
-Pglive package adds support for thread-safe live plotting to PyqtGraph.  
+Pglive package adds support for thread-safe live plotting to pyqtgraph.  
 It supports PyQt5 and PyQt6.
 
 # Description #
 
-By default, PyqtGraph doesn't support live plotting.
+By default, pyqtgraph doesn't support live plotting.
 Aim of this package is to provide easy implementation of Line, Scatter and Bar Live plot.
 Every plot is connected with it's DataConnector, which sole purpose is to consume data points and manage data re-plotting.
 DataConnector interface provides Pause and Resume method, update rate and maximum number of plotted points.
@@ -64,5 +64,5 @@ Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlo
 # Summary #
 
 - With Pglive You've got easy Thread-safe implementation of fast Live plots.
-- You can use all `kwargs` specified in PyqtGraph
+- You can use all `kwargs` specified in pyqtgraph
 - **Focus on Data Collection, not Data Plotting**
