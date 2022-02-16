@@ -13,7 +13,7 @@ Each time data point is collected, call `DataConnector.cb_set_data` or `DataConn
 That's all You need to update plot with new data.
 Callbacks are Thread safe, so it works nicely in applications with multiple data collection Threads.  
 
-**Just focus on data collection and leave plotting to pglive.**
+**Focus on data collection and leave plotting to pglive.**
 
 To make firsts steps easy, package comes with many examples implemented in PyQt5 or PyQt6.
 
