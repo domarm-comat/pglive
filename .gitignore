@@ -1,0 +1,12 @@
+/build/
+/dist/
+/.idea/
+/pglive.egg-info/
+*.pyc
+*.log
+*.log.*
+/htmlcov/
+/.cache/
+/venv/
+/.pytest_cache
+.coverage

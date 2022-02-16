@@ -45,7 +45,8 @@ examples.app.exec()
 examples.stop()
 ```
 
-Output:
+Output:  
+
 ![Plot example](https://i.postimg.cc/RFYGfNS6/pglive.gif)
 
 # Crosshair #
