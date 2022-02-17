@@ -20,9 +20,12 @@ To make firsts steps easy, package comes with many examples implemented in PyQt5
 # Code examples #
 
 ```python
-import pglive.examples_pyqt6 as examples
-import signal
+import sys
+from math import sin
 from threading import Thread
+from time import sleep
+
+from PyQt6.QtWidgets import QApplication
 
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_plot import LiveLinePlot
@@ -31,23 +34,42 @@ from pglive.sources.live_plot_widget import LivePlotWidget
 """
 In this example Line plot is displayed.
 """
-win = LivePlotWidget(title="Line Plot @ 100Hz")
-plot = LiveLinePlot()
-win.addItem(plot)
+app = QApplication(sys.argv)
+running = True
 
-data_connector = DataConnector(plot, max_points=600)
+plot_widget = LivePlotWidget(title="Line Plot @ 100Hz")
+plot_curve = LiveLinePlot()
+plot_widget.addItem(plot_curve)
+# DataConnector holding 600 points and plots @ 100Hz
+data_connector = DataConnector(plot_curve, max_points=600, update_rate=100)
 
-win.show()
 
-Thread(target=examples.sin_wave_generator, args=(data_connector,)).start()
-signal.signal(signal.SIGINT, lambda sig, frame: examples.stop())
-examples.app.exec()
-examples.stop()
+def sin_wave_generator(connector):
+    """Sinus wave generator"""
+    x = 0
+    while running:
+        x += 1
+        data_point = sin(x * 0.01)
+        # Callback to plot new data point
+        connector.cb_append_data_point(data_point, x)
+
+        sleep(0.01)
+
+
+plot_widget.show()
+Thread(target=sin_wave_generator, args=(data_connector,)).start()
+app.exec()
+running = False
 ```
 
 Output:  
 
 ![Plot example](https://i.postimg.cc/RFYGfNS6/pglive.gif)
+
+To run built-in examples, use python3 -m parameter like:  
+`python3 -m pglive.examples_pyqt6.all_plot_types`  
+`python3 -m pglive.examples_pyqt6.crosshair`
+
 
 # Crosshair #
 
