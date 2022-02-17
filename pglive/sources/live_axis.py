@@ -9,7 +9,7 @@ if QT_LIB == PYQT6:
 else:
     from PyQt5.QtGui import QPen
 
-from pyqtgraph import debug as debug
+from pyqtgraph import debug as debug, mkPen, getConfigOption
 
 
 class LiveAxis(pg.AxisItem):
@@ -25,13 +25,29 @@ class LiveAxis(pg.AxisItem):
         else:
             self.setTextPen(textPen)
         # Set axisPen
-        if axisPen is not None and not isinstance(axisPen, QPen):
-            axisPen = pg.mkPen(color=axisPen)
-        self.axisPen = axisPen
-        if self.axisPen is None:
-            self.axisPen = self.pen()
+        if axisPen is None:
+            self.setAxisPen()
+        else:
+            self.setAxisPen(axisPen)
         # Tick format
         self.tick_format = kwargs.get(Axis.TICK_FORMAT, None)
+
+    def axisPen(self):
+        if self._axisPen is None:
+            return mkPen(getConfigOption('foreground'))
+        return mkPen(self._axisPen)
+
+    def setAxisPen(self, *args, **kwargs):
+        """
+        Set axis pen used for drawing axis line.
+        If no arguments are given, the default foreground color will be used.
+        """
+        self.picture = None
+        if args or kwargs:
+            self._axisPen = mkPen(*args, **kwargs)
+        else:
+            self._axisPen = mkPen(getConfigOption('foreground'))
+        self._updateLabel()
 
     def tickStrings(self, values, scale, spacing):
         if self.tick_format == Axis.DATETIME:
@@ -53,7 +69,7 @@ class LiveAxis(pg.AxisItem):
         # draw long line along axis
         pen, p1, p2 = axisSpec
         # Use axis pen to draw axis line
-        p.setPen(self.axisPen)
+        p.setPen(self.axisPen())
         p.drawLine(p1, p2)
         # Switch back to normal pen
         p.setPen(pen)

@@ -93,6 +93,6 @@ To make life easier, pglive includes few axis improvements:
 
 # Summary #
 
-- With Pglive You've got easy Thread-safe implementation of fast Live plots.
+- With Pglive You've got easy Thread-safe implementation of fast Live plots
 - You can use all `kwargs` specified in pyqtgraph
-- **Focus on Data Collection, not Data Plotting**
+- **Focus on Data Handling, not Data Plotting**
