@@ -5,13 +5,12 @@ It supports PyQt5 and PyQt6.
 
 # Description #
 
-By default, pyqtgraph doesn't support live plotting.
-Aim of this package is to provide easy implementation of Line, Scatter and Bar Live plot.
-Every plot is connected with it's DataConnector, which sole purpose is to consume data points and manage data re-plotting.
-DataConnector interface provides Pause and Resume method, update rate and maximum number of plotted points.
-Each time data point is collected, call `DataConnector.cb_set_data` or `DataConnector.cb_append_data_point` callback.
-That's all You need to update plot with new data.
-Callbacks are Thread safe, so it works nicely in applications with multiple data collection Threads.  
+By default, pyqtgraph doesn't support live plotting. Aim of this package is to provide easy implementation of Line,
+Scatter and Bar Live plot. Every plot is connected with it's DataConnector, which sole purpose is to consume data points
+and manage data re-plotting. DataConnector interface provides Pause and Resume method, update rate and maximum number of
+plotted points. Each time data point is collected, call `DataConnector.cb_set_data`
+or `DataConnector.cb_append_data_point` callback. That's all You need to update plot with new data. Callbacks are Thread
+safe, so it works nicely in applications with multiple data collection Threads.
 
 **Focus on data collection and leave plotting to pglive.**
 
@@ -62,7 +61,7 @@ app.exec()
 running = False
 ```
 
-Output:  
+Output:
 
 ![Plot example](https://i.postimg.cc/RFYGfNS6/pglive.gif)
 
@@ -70,6 +69,12 @@ To run built-in examples, use python3 -m parameter like:
 `python3 -m pglive.examples_pyqt6.all_plot_types`  
 `python3 -m pglive.examples_pyqt6.crosshair`
 
+# Available plot types #
+
+Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlot` (horizontal bar plot)
+and `LiveVBarPlot` (vertical bar plot).
+
+![All plot types](https://i.postimg.cc/637CsKRC/pglive-allplots.gif)
 
 # Crosshair #
 
@@ -77,11 +82,14 @@ Pglive comes with built-in Crosshair as well.
 
 ![Crosshair](https://i.postimg.cc/1z75GZLV/pglive-crosshair.gif)
 
-# Available plot types #
+# Axis #
 
-Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlot` (horizontal bar plot) and `LiveVBarPlot` (vertical bar plot).
+To make life easier, pglive includes few axis improvements:
 
-![All plot types](https://i.postimg.cc/637CsKRC/pglive-allplots.gif)
+- Colored axis line using new `axisPen` attribute
+- Time and DateTime tick format, converting timestamp into human readable format
+
+![Crosshair](https://i.postimg.cc/8kr0L2YJ/pglive-axis.gif)
 
 # Summary #
 
