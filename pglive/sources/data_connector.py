@@ -79,7 +79,10 @@ class DataConnector(QObject):
             else:
                 self.y = deque(y, maxlen=self.max_points)
             if x is not None:
-                self.x = x
+                if self.max_points == inf:
+                    self.x = x
+                else:
+                    self.x = deque(x, maxlen=self.max_points)
             else:
                 self.x = range(len(self.y))
             self._update_data(**kwargs)
@@ -93,6 +96,8 @@ class DataConnector(QObject):
             self.y.append(y)
             if x is not None:
                 self.x.append(x)
+            elif len(self.x) == 0:
+                self.x.append(0)
             else:
-                self.x = range(len(self.y))
+                self.x.append(self.x[-1] + 1)
             self._update_data(**kwargs)
