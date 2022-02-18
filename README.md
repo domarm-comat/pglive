@@ -76,6 +76,9 @@ and `LiveVBarPlot` (vertical bar plot).
 
 ![All plot types](https://i.postimg.cc/637CsKRC/pglive-allplots.gif)
 
+From *v0.2.0* you can use any Line, Scatter or Bar pyqgtraph with `DataConnector` directly.  
+No need to use specific `LivePlot` class.  
+
 # Crosshair #
 
 Pglive comes with built-in Crosshair as well.
@@ -95,4 +98,5 @@ To make life easier, pglive includes few axis improvements:
 
 - With Pglive You've got easy Thread-safe implementation of fast Live plots
 - You can use all `kwargs` specified in pyqtgraph
+- Use your pyqtgraph plots with `DataConnector` directly, no need to use specific `LivePlot` class 
 - **Focus on Data Handling, not Data Plotting**

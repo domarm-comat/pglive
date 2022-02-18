@@ -11,7 +11,7 @@ if QT_LIB == PYQT6:
 else:
     from PyQt5.QtCore import QObject, pyqtSignal
 
-from pglive.sources.live_plot import LiveLinePlot, LiveScatterPlot
+from pglive.sources.live_plot import LiveMixin, LiveMixinBarPlot, make_live
 
 
 class DataConnector(QObject):
@@ -21,7 +21,7 @@ class DataConnector(QObject):
     paused = False
     last_update = time.time()
 
-    def __init__(self, plot: Union[LiveLinePlot, LiveScatterPlot], max_points=inf, update_rate=inf) -> None:
+    def __init__(self, plot: Union[LiveMixin, LiveMixinBarPlot], max_points=inf, update_rate=inf) -> None:
         """
 
         :param plot: Plot to be connected with Data
@@ -29,6 +29,10 @@ class DataConnector(QObject):
         :param float update_rate: Update rate in Hz
         """
         super().__init__()
+        if not isinstance(plot, (LiveMixin, LiveMixinBarPlot)):
+            # Attempt to convert plot into live if it's not already
+            make_live(plot)
+
         self.data_lock = Lock()
         self.max_points = max_points
         self.update_timeout = 1 / update_rate

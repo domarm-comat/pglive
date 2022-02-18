@@ -1,6 +1,7 @@
 from typing import List, Union
-
+import numpy as np
 import pyqtgraph as pg
+from pyqtgraph import GraphicsObject
 
 if pg.Qt.QT_LIB == pg.Qt.PYQT6:
     from PyQt6.QtCore import pyqtSlot
@@ -50,3 +51,17 @@ class LiveVBarPlot(pg.BarGraphItem, LiveMixinBarPlot):
 
     def setData(self, x, y, kwargs):
         self.setOpts(y0=self.y0, x=x, height=y, width=self.bar_width, **kwargs)
+
+
+def make_live(plot: GraphicsObject):
+    """Convert plot into Live plot"""
+    if isinstance(plot, pg.BarGraphItem):
+        # Create horizontal bar plot in case of bar plot
+        plot.bar_width = 1
+        plot.y0 = 0
+        plot.slot_new_data = lambda y, x, kwargs: plot.setOpts(y0=plot.y0, x=x, height=y, width=plot.bar_width,
+                                                               **kwargs)
+    elif isinstance(plot, pg.PlotCurveItem):
+        plot.slot_new_data = lambda y, x, kwargs: plot.setData(np.array(x), np.array(y), **kwargs)
+    else:
+        plot.slot_new_data = lambda y, x, kwargs: plot.setData(x, y, **kwargs)
