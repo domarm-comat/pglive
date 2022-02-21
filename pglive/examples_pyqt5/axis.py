@@ -10,7 +10,7 @@ import pyqtgraph as pg
 from pglive.kwargs import Axis
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_axis import LiveAxis
-from pglive.sources.live_plot import LinePlotLivePlotLeadingLine
+from pglive.sources.live_plot import LiveLinePlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
@@ -24,7 +24,7 @@ left_axis = LiveAxis("left", axisPen="red", textPen="red")
 bottom_axis = LiveAxis("bottom", axisPen="green", textPen="green", **{Axis.TICK_FORMAT: Axis.TIME})
 time_axis_plot_widget = LivePlotWidget(title="Time Line Plot @ 100Hz",
                                        axisItems={'bottom': bottom_axis, 'left': left_axis})
-plot = LinePlotLivePlotLeadingLine()
+plot = LiveLinePlot()
 time_axis_plot_widget.addItem(plot)
 connectors.append(DataConnector(plot, max_points=600))
 layout.addWidget(time_axis_plot_widget)
@@ -34,7 +34,7 @@ left_axis = LiveAxis("left", axisPen="purple", textPen="purple")
 bottom_axis = LiveAxis("bottom", axisPen="yellow", textPen="yellow", **{Axis.TICK_FORMAT: Axis.DATETIME})
 datetime_axis_plot_widget = LivePlotWidget(title="DateTime Line Plot @ 100Hz",
                                            axisItems={'bottom': bottom_axis, 'left': left_axis})
-plot = LinePlotLivePlotLeadingLine()
+plot = LiveLinePlot()
 datetime_axis_plot_widget.addItem(plot)
 
 layout.addWidget(datetime_axis_plot_widget)

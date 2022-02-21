@@ -10,7 +10,7 @@ else:
     from PyQt5.QtCore import pyqtSlot
 
 
-class LinePlotLivePlotLeadingLine(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
+class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
     """Line plot"""
 
     @pyqtSlot()
@@ -23,7 +23,7 @@ class LinePlotLivePlotLeadingLine(pg.PlotDataItem, MixinLivePlot, MixinLeadingLi
         self.update_leading_text(self.xData[-1], self.yData[-1])
 
 
-class ScatterPlotLivePlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
+class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     """Scatter plot"""
 
     @pyqtSlot()
@@ -37,7 +37,7 @@ class ScatterPlotLivePlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
         self.update_leading_text(last_point[0], last_point[1])
 
 
-class HLiveBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
+class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Horizontal Bar Plot"""
 
     def __init__(self, x0=0, bar_height=1, **kwargs):
@@ -58,7 +58,7 @@ class HLiveBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.update_leading_text(self.opts["width"][-1], self.opts["y"][-1])
 
 
-class VLiveBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
+class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Vertical Bar Plot"""
 
     def __init__(self, y0=0, bar_width=1, **kwargs):
