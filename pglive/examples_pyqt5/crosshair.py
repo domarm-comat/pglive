@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
 from pglive.kwargs import Crosshair
 from pglive.sources.data_connector import DataConnector
-from pglive.sources.live_plot import LiveLinePlot
+from pglive.sources.live_plot import LinePlotLivePlotLeadingLine
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
@@ -32,7 +32,7 @@ kwargs = {Crosshair.ENABLED: True,
 
 # Create plot widget
 widget = LivePlotWidget(title="Line Plot and Crosshair @ 100Hz", **kwargs)
-plot = LiveLinePlot()
+plot = LinePlotLivePlotLeadingLine()
 widget.addItem(plot)
 
 # Connect plot with DataConnector

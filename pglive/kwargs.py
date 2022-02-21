@@ -10,3 +10,11 @@ class Axis:
     TICK_FORMAT = "Tick_Format"  # "Tick format"
     DATETIME = "DateTime"
     TIME = "Time"
+
+
+class LeadingLine:
+    HORIZONTAL = "Horizontal"
+    VERTICAL = "Vertical"
+    TEXT_COLOR = "TextColor"
+    AXIS_X = "x"
+    AXIS_Y = "y"

@@ -3,14 +3,14 @@ import signal
 from threading import Thread
 
 from pglive.sources.data_connector import DataConnector
-from pglive.sources.live_plot import LiveLinePlot
+from pglive.sources.live_plot import LinePlotLivePlotLeadingLine
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
 In this example Line plot is displayed.
 """
 win = LivePlotWidget(title="Line Plot @ 100Hz")
-plot = LiveLinePlot()
+plot = LinePlotLivePlotLeadingLine()
 win.addItem(plot)
 
 data_connector = DataConnector(plot, max_points=600)

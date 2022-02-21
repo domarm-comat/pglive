@@ -4,7 +4,7 @@ from threading import Thread
 import pyqtgraph as pg
 
 from pglive.sources.data_connector import DataConnector
-from pglive.sources.live_plot import LiveHBarPlot, LiveVBarPlot, LiveLinePlot, LiveScatterPlot
+from pglive.sources.live_plot import HLiveBarPlot, VLiveBarPlot, LinePlotLivePlotLeadingLine, ScatterPlotLivePlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
@@ -14,10 +14,10 @@ In this example all plot types are displayed.
 layout = pg.LayoutWidget()
 args = []
 plots = [
-    ["Horizontal Bar Plot", LiveHBarPlot(bar_height=2, brush="blue", pen="blue")],
-    ["Vertical Bar Plot", LiveVBarPlot(bar_width=2, brush="green", pen="green")],
-    ["Line Plot", LiveLinePlot(pen="red")],
-    ["Scatter Plot", LiveScatterPlot(brush="yellow", pen="yellow")],
+    ["Horizontal Bar Plot", HLiveBarPlot(bar_height=2, brush="blue", pen="blue")],
+    ["Vertical Bar Plot", VLiveBarPlot(bar_width=2, brush="green", pen="green")],
+    ["Line Plot", LinePlotLivePlotLeadingLine(pen="red")],
+    ["Scatter Plot", ScatterPlotLivePlot(brush="yellow", pen="yellow")],
 ]
 
 for title, plot in plots:

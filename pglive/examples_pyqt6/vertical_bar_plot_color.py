@@ -5,7 +5,7 @@ from threading import Thread
 from time import sleep
 
 from pglive.sources.data_connector import DataConnector
-from pglive.sources.live_plot import LiveVBarPlot
+from pglive.sources.live_plot import VLiveBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
@@ -13,7 +13,7 @@ In this example Vertical Bar plot is displayed.
 Every update bar color is changed as well.
 """
 win = LivePlotWidget(title="Coloured Vertical Bar Plot @ 100Hz")
-plot = LiveVBarPlot(bar_width=1)
+plot = VLiveBarPlot(bar_width=1)
 win.addItem(plot)
 
 data_connector = DataConnector(plot, max_points=600)

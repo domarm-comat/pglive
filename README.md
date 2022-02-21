@@ -27,7 +27,7 @@ from time import sleep
 from PyQt6.QtWidgets import QApplication
 
 from pglive.sources.data_connector import DataConnector
-from pglive.sources.live_plot import LiveLinePlot
+from pglive.sources.live_plot import LinePlotLivePlotLeadingLine
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
@@ -37,7 +37,7 @@ app = QApplication(sys.argv)
 running = True
 
 plot_widget = LivePlotWidget(title="Line Plot @ 100Hz")
-plot_curve = LiveLinePlot()
+plot_curve = LinePlotLivePlotLeadingLine()
 plot_widget.addItem(plot_curve)
 # DataConnector holding 600 points and plots @ 100Hz
 data_connector = DataConnector(plot_curve, max_points=600, update_rate=100)
@@ -84,6 +84,13 @@ No need to use specific `LivePlot` class.
 Pglive comes with built-in Crosshair as well.
 
 ![Crosshair](https://i.postimg.cc/1z75GZLV/pglive-crosshair.gif)
+
+# Leading lines #
+
+Leading line displays horizontal or vertical line (or both) at the last plotted point.  
+You can choose it's color and which axis value is displayed along with it.  
+
+![Leading lines](https://i.postimg.cc/bYKQGBNp/leading-line.gif)
 
 # Axis #
 

@@ -11,7 +11,7 @@ if QT_LIB == PYQT6:
 else:
     from PyQt5.QtCore import QObject, pyqtSignal
 
-from pglive.sources.live_plot import LiveMixin, LiveMixinBarPlot, make_live
+from pglive.sources.live_plot import MixinLivePlot, MixinLiveBarPlot, make_live
 
 
 class DataConnector(QObject):
@@ -19,27 +19,36 @@ class DataConnector(QObject):
     sig_paused = pyqtSignal()
     sig_resumed = pyqtSignal()
     paused = False
-    last_update = time.time()
+    # Last update time, using perf_counter for most precise counter
+    last_update = time.perf_counter()
 
-    def __init__(self, plot: Union[LiveMixin, LiveMixinBarPlot], max_points=inf, update_rate=inf) -> None:
+    def __init__(self, plot: Union[MixinLivePlot, MixinLiveBarPlot], max_points=inf, update_rate=inf) -> None:
         """
-
+        DataConnector is connecting plot with data and makes sure, that all updates are thread-safe.
+        To make plot compatible and work with Connector, it must implement slot_new_data method.
+        This can be achieved either by inheriting from LiveMixin or LiveMixinBarPlot class or DataConnector, tries to
+        use make_live function and add slot in runtime.
         :param plot: Plot to be connected with Data
         :param max_points: Maximum amount of data points to plot
         :param float update_rate: Update rate in Hz
         """
         super().__init__()
-        if not isinstance(plot, (LiveMixin, LiveMixinBarPlot)):
+        if not isinstance(plot, (MixinLivePlot, MixinLiveBarPlot)):
             # Attempt to convert plot into live if it's not already
             make_live(plot)
-
+        # Data update lock, ensuring thread-safety
         self.data_lock = Lock()
+        # Maximum number of points to plot
         self.max_points = max_points
+        # Calculating update timeout from update_rate frequency
         self.update_timeout = 1 / update_rate
         if self.max_points == inf:
+            # Use simple list if there is no point limits
             self.x, self.y = [], []
         else:
+            # Use deque with maxlen otherwise
             self.x, self.y = deque(maxlen=self.max_points), deque(maxlen=self.max_points)
+        # Set plot and connect sig_new_data with plot.slot_new_data
         self.plot = plot
         self.sig_new_data.connect(self.plot.slot_new_data)
 
@@ -64,13 +73,13 @@ class DataConnector(QObject):
 
     def _skip_update(self) -> bool:
         """Skip update"""
-        return self.paused or (time.time() - self.last_update) < self.update_timeout or self.data_lock.locked()
+        return self.paused or (time.perf_counter() - self.last_update) < self.update_timeout or self.data_lock.locked()
 
     def _update_data(self, **kwargs):
         """Update data and last update time"""
         # Notify all connected plots
         self.sig_new_data.emit(self.y, self.x, kwargs)
-        self.last_update = time.time()
+        self.last_update = time.perf_counter()
 
     def cb_set_data(self, y: List[Union[int, float]], x: List[Union[int, float]] = None, **kwargs) -> None:
         """Replace current data"""

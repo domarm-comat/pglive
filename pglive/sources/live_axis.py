@@ -1,18 +1,18 @@
 import datetime
 
 import pyqtgraph as pg
-from pyqtgraph.Qt import QT_LIB, PYQT6
+from pyqtgraph import debug as debug, mkPen, getConfigOption
+
 from pglive.kwargs import Axis
 
-if QT_LIB == PYQT6:
+if pg.Qt.QT_LIB == pg.Qt.PYQT6:
     from PyQt6.QtGui import QPen
 else:
     from PyQt5.QtGui import QPen
 
-from pyqtgraph import debug as debug, mkPen, getConfigOption
-
 
 class LiveAxis(pg.AxisItem):
+    """Implements live axis"""
 
     def __init__(self, orientation, pen=None, textPen=None, axisPen=None, linkView=None, parent=None, maxTickLength=-5,
                  showValues=True, text='', units='', unitPrefix='', **kwargs):
@@ -32,12 +32,13 @@ class LiveAxis(pg.AxisItem):
         # Tick format
         self.tick_format = kwargs.get(Axis.TICK_FORMAT, None)
 
-    def axisPen(self):
+    def axisPen(self) -> QPen:
+        """Get axis pen"""
         if self._axisPen is None:
             return mkPen(getConfigOption('foreground'))
         return mkPen(self._axisPen)
 
-    def setAxisPen(self, *args, **kwargs):
+    def setAxisPen(self, *args, **kwargs) -> None:
         """
         Set axis pen used for drawing axis line.
         If no arguments are given, the default foreground color will be used.
@@ -49,7 +50,8 @@ class LiveAxis(pg.AxisItem):
             self._axisPen = mkPen(getConfigOption('foreground'))
         self._updateLabel()
 
-    def tickStrings(self, values, scale, spacing):
+    def tickStrings(self, values: list, scale: float, spacing: float) -> list:
+        """Convert ticks into final strings"""
         if self.tick_format == Axis.DATETIME:
             # Convert tick to Datetime
             return [datetime.datetime.fromtimestamp(value).strftime("%Y-%m-%d %H:%M:%S") for value in values]

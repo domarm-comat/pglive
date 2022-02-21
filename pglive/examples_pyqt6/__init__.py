@@ -17,13 +17,16 @@ def stop():
     app.exit(0)
 
 
-def sin_wave_generator(*data_connectors):
+def sin_wave_generator(*data_connectors, flip=False):
     """Sinus wave generator"""
     x = 0
     while running:
         x += 1
         for data_connector in data_connectors:
-            data_connector.cb_append_data_point(sin(x * 0.01), x)
+            if flip:
+                data_connector.cb_append_data_point(x, sin(x * 0.025))
+            else:
+                data_connector.cb_append_data_point(sin(x * 0.025), x)
         sleep(0.01)
 
 

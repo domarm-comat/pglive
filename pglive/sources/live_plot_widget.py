@@ -13,6 +13,7 @@ from pglive.kwargs import Crosshair
 
 
 class LivePlotWidget(pg.PlotWidget):
+    """Implements main plot widget for all live plots"""
     mouse_position: Optional[QPointF] = None
     sig_crosshair_moved = pyqtSignal(QPointF)
     sig_crosshair_out = pyqtSignal()
@@ -25,6 +26,18 @@ class LivePlotWidget(pg.PlotWidget):
         if self.crosshair_enabled:
             self._add_crosshair(kwargs.get(Crosshair.LINE_PEN, None),
                                 kwargs.get(Crosshair.TEXT_KWARGS, {}))
+
+        # Override addItem method
+        def addItem(*args):
+            if hasattr(args[0], "_vl_kwargs") and args[0]._vl_kwargs is not None:
+                self.plotItem.addItem(args[0]._vl_kwargs["line"], ignoreBounds=True)
+                self.plotItem.addItem(args[0]._vl_kwargs["text"], ignoreBounds=True)
+            if hasattr(args[0], "_hl_kwargs") and args[0]._hl_kwargs is not None:
+                self.plotItem.addItem(args[0]._hl_kwargs["line"], ignoreBounds=True)
+                self.plotItem.addItem(args[0]._hl_kwargs["text"], ignoreBounds=True)
+            self.plotItem.addItem(*args)
+
+        self.addItem = addItem
 
     def _add_crosshair(self, crosshair_pen: QPen, crosshair_text_kwargs: dict) -> None:
         """Add crosshair into plot"""

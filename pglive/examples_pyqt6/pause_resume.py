@@ -5,7 +5,7 @@ from threading import Thread
 from PyQt6.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
 
 from pglive.sources.data_connector import DataConnector
-from pglive.sources.live_plot import LiveScatterPlot
+from pglive.sources.live_plot import ScatterPlotLivePlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
@@ -15,7 +15,7 @@ When Live plot is paused, data are not collected.
 """
 # Create parent widget
 widget = LivePlotWidget(title="Line Plot @ 100Hz")
-plot = LiveScatterPlot()
+plot = ScatterPlotLivePlot()
 widget.addItem(plot)
 
 # Create plot widget
