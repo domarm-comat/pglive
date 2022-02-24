@@ -18,7 +18,7 @@ def stop():
 
 
 def sin_wave_generator(*data_connectors, flip=False):
-    """Sinus wave generator"""
+    """Sine wave generator"""
     x = 0
     while running:
         x += 1

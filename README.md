@@ -44,7 +44,7 @@ data_connector = DataConnector(plot_curve, max_points=600, update_rate=100)
 
 
 def sin_wave_generator(connector):
-    """Sinus wave generator"""
+    """Sine wave generator"""
     x = 0
     while running:
         x += 1
