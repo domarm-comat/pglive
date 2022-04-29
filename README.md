@@ -69,10 +69,13 @@ To run built-in examples, use python3 -m parameter like:
 `python3 -m pglive.examples_pyqt6.all_plot_types`  
 `python3 -m pglive.examples_pyqt6.crosshair`
 
-# Create window using PyQt5/6 designer #
+# Using PyQt5/6 designer #
 
-1. Add QWidget to Your layout in designer
+1. Add QWidget to Your layout
 2. Promote QWidget to `LivePlotWidget` and set header file to `pglive.sources.live_plot_widget`
+3. Click `Add` and `Promote` button
+
+![All plot types](https://i.postimg.cc/m25NVJZm/designer-promotion.png)
 
 # Available plot types #
 
