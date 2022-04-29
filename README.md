@@ -69,6 +69,11 @@ To run built-in examples, use python3 -m parameter like:
 `python3 -m pglive.examples_pyqt6.all_plot_types`  
 `python3 -m pglive.examples_pyqt6.crosshair`
 
+# Create window using PyQt5/6 designer #
+
+1. Add QWidget to Your layout in designer
+2. Promote QWidget to `LivePlotWidget` and set header file to `pglive.sources.live_plot_widget`
+
 # Available plot types #
 
 Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlot` (horizontal bar plot)
