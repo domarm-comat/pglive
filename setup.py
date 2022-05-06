@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pglive",
-    version="0.2.3",
+    version="0.2.4",
     license='MIT',
     author="Martin Domaracký",
     author_email="domarm@comat.sk",

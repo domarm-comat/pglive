@@ -23,6 +23,8 @@ class LivePlotWidget(pg.PlotWidget):
         super().__init__(parent=parent, background=background, plotItem=plotItem, **kwargs)
         self.crosshair_enabled = kwargs.get(Crosshair.ENABLED, False)
         self.crosshair_items = []
+        self.crosshair_x_axis = kwargs.get(Crosshair.X_AXIS, "bottom")
+        self.crosshair_y_axis = kwargs.get(Crosshair.Y_AXIS, "left")
         if self.crosshair_enabled:
             self._add_crosshair(kwargs.get(Crosshair.LINE_PEN, None),
                                 kwargs.get(Crosshair.TEXT_KWARGS, {}))
@@ -91,11 +93,19 @@ class LivePlotWidget(pg.PlotWidget):
 
     def x_format(self, value: Union[int, float]) -> str:
         """X tick format"""
-        return str(round(value, 4))
+        try:
+            # Get crosshair X str format from bottom tick axis format
+            return self.getPlotItem().axes[self.crosshair_x_axis]["item"].tickStrings((value,), 0, 1)[0]
+        except Exception:
+            return str(round(value, 4))
 
     def y_format(self, value: Union[int, float]) -> str:
         """Y tick format"""
-        return str(round(value, 4))
+        try:
+            # Get crosshair Y str format from left tick axis format
+            return self.getPlotItem().axes[self.crosshair_y_axis]["item"].tickStrings((value,), 0, 1)[0]
+        except Exception:
+            return str(round(value, 4))
 
     def leaveEvent(self, ev: QEvent) -> None:
         """Mouse left PlotWidget"""
