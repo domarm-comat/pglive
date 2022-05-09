@@ -37,6 +37,9 @@ class LivePlotWidget(pg.PlotWidget):
             if hasattr(args[0], "_hl_kwargs") and args[0]._hl_kwargs is not None:
                 self.plotItem.addItem(args[0]._hl_kwargs["line"], ignoreBounds=True)
                 self.plotItem.addItem(args[0]._hl_kwargs["text"], ignoreBounds=True)
+            if hasattr(args[0], "update_leading_line"):
+                setattr(args[0], "x_format", self.x_format)
+                setattr(args[0], "y_format", self.y_format)
             self.plotItem.addItem(*args)
 
         self.addItem = addItem

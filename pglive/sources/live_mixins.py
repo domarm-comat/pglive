@@ -63,11 +63,11 @@ class MixinLeadingLine:
         raise NotImplementedError
 
     def x_format(self, value: Union[int, float]) -> str:
-        """X tick format"""
+        """X tick format (will be overwritten when inserted in LivePlotWidget)"""
         return str(round(value, 4))
 
     def y_format(self, value: Union[int, float]) -> str:
-        """Y tick format"""
+        """Y tick format (will be overwritten when inserted in LivePlotWidget)"""
         return str(round(value, 4))
 
     @pyqtSlot()
