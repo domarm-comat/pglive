@@ -5,6 +5,14 @@ import pyqtgraph as pg
 if pg.Qt.QT_LIB == pg.Qt.PYQT6:
     from PyQt6.QtCore import QPointF, pyqtSignal, QEvent
     from PyQt6.QtGui import QPen
+elif pg.Qt.QT_LIB == pg.Qt.PYSIDE6:
+    from PySide6.QtCore import QPointF, QEvent
+    from PySide6.QtGui import QPen
+    from PySide6.QtCore import Signal as pyqtSignal
+elif pg.Qt.QT_LIB == pg.Qt.PYSIDE2:
+    from PySide2.QtCore import QPointF, QEvent
+    from PySide2.QtGui import QPen
+    from PySide2.QtCore import Signal as pyqtSignal
 else:
     from PyQt5.QtCore import QPointF, pyqtSignal, QEvent
     from PyQt5.QtGui import QPen

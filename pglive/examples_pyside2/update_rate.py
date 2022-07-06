@@ -1,4 +1,4 @@
-import pglive.examples_pyqt5 as examples
+import pglive.examples_pyside2 as examples
 from math import ceil
 from threading import Thread
 
@@ -36,5 +36,5 @@ for index in range(4):
 layout.show()
 
 Thread(target=examples.sin_wave_generator, args=args).start()
-examples.app.exec()
+examples.app.exec_()
 examples.stop()

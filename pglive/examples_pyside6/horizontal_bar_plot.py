@@ -1,4 +1,4 @@
-import pglive.examples_pyqt5 as examples
+import pglive.examples_pyside6 as examples
 from threading import Thread
 
 from pglive.sources.data_connector import DataConnector

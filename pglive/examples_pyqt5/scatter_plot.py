@@ -1,4 +1,4 @@
-import pglive.examples_pyqt6 as examples
+import pglive.examples_pyqt5 as examples
 import signal
 from threading import Thread
 

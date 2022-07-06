@@ -1,4 +1,4 @@
-import pglive.examples_pyqt5 as examples
+import pglive.examples_pyside6 as examples
 import signal
 from math import sin
 from threading import Thread

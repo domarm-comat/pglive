@@ -6,6 +6,10 @@ from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiv
 
 if pg.Qt.QT_LIB == pg.Qt.PYQT6:
     from PyQt6.QtCore import pyqtSlot
+elif pg.Qt.QT_LIB == pg.Qt.PYSIDE6:
+    from PySide6.QtCore import Slot as pyqtSlot
+elif pg.Qt.QT_LIB == pg.Qt.PYSIDE2:
+    from PySide2.QtCore import Slot as pyqtSlot
 else:
     from PyQt5.QtCore import pyqtSlot
 

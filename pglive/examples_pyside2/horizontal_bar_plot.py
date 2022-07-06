@@ -1,4 +1,4 @@
-import pglive.examples_pyqt5 as examples
+import pglive.examples_pyside2 as examples
 from threading import Thread
 
 from pglive.sources.data_connector import DataConnector
@@ -16,5 +16,5 @@ data_connector = DataConnector(plot, max_points=600)
 win.show()
 
 Thread(target=examples.sin_wave_generator, args=(data_connector,)).start()
-examples.app.exec()
+examples.app.exec_()
 examples.stop()

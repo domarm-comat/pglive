@@ -1,7 +1,7 @@
 # Live pyqtgraph plot
 
 Pglive package adds support for thread-safe live plotting to pyqtgraph.  
-It supports PyQt5 and PyQt6.
+It supports PyQt5, PyQt6, PySide2 and PySide6.
 
 # Description #
 
@@ -15,6 +15,7 @@ safe, so it works nicely in applications with multiple data collection Threads.
 **Focus on data collection and leave plotting to pglive.**
 
 To make firsts steps easy, package comes with many examples implemented in PyQt5 or PyQt6.
+Support for PySide2 and PySide6 was added in version 0.3.0.
 
 # Code examples #
 

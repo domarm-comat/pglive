@@ -1,4 +1,4 @@
-import pglive.examples_pyqt5 as examples
+import pglive.examples_pyside2 as examples
 import signal
 from math import sin
 from threading import Thread
@@ -34,5 +34,5 @@ win.show()
 
 Thread(target=sin_wave_generator, args=(data_connector,)).start()
 signal.signal(signal.SIGINT, lambda sig, frame: examples.stop())
-examples.app.exec()
+examples.app.exec_()
 examples.stop()
