@@ -4,10 +4,15 @@ from math import inf
 from threading import Lock
 from typing import List, Union
 
-from pyqtgraph.Qt import QT_LIB, PYQT6
-
+from pyqtgraph.Qt import QT_LIB, PYQT6, PYSIDE2, PYSIDE6
 if QT_LIB == PYQT6:
     from PyQt6.QtCore import QObject, pyqtSignal
+elif QT_LIB == PYSIDE6:
+    from PySide6.QtCore import QObject
+    from PySide6.QtCore import Signal as pyqtSignal
+elif QT_LIB == PYSIDE2:
+    from PySide2.QtCore import QObject
+    from PySide2.QtCore import Signal as pyqtSignal
 else:
     from PyQt5.QtCore import QObject, pyqtSignal
 

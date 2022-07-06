@@ -1,8 +1,8 @@
-import pglive.examples_pyqt5 as examples
+import pglive.examples_pyside6 as examples
 import signal
 from threading import Thread
 
-from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
+from PySide6.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
 
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_plot import LiveScatterPlot

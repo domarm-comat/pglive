@@ -1,4 +1,4 @@
-import pglive.examples_pyqt5 as examples
+import pglive.examples_pyside6 as examples
 from math import ceil
 from threading import Thread
 

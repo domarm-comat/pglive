@@ -1,8 +1,8 @@
-import pglive.examples_pyqt5 as examples
+import pglive.examples_pyside2 as examples
 import signal
 from threading import Thread
 
-from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
+from PySide2.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
 
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_plot import LiveScatterPlot
@@ -49,5 +49,5 @@ parent_widget.show()
 
 Thread(target=examples.sin_wave_generator, args=(data_connector,)).start()
 signal.signal(signal.SIGINT, lambda sig, frame: examples.stop())
-examples.app.exec()
+examples.app.exec_()
 examples.stop()
