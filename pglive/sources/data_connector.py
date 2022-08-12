@@ -5,6 +5,7 @@ from threading import Lock
 from typing import List, Union
 
 from pyqtgraph.Qt import QT_LIB, PYQT6, PYSIDE2, PYSIDE6
+
 if QT_LIB == PYQT6:
     from PyQt6.QtCore import QObject, pyqtSignal
 elif QT_LIB == PYSIDE6:
@@ -25,9 +26,11 @@ class DataConnector(QObject):
     sig_resumed = pyqtSignal()
     paused = False
     # Last update time, using perf_counter for most precise counter
-    last_update = time.perf_counter()
+    last_update = 0
+    last_plot = 0
 
-    def __init__(self, plot: Union[MixinLivePlot, MixinLiveBarPlot], max_points=inf, update_rate=inf) -> None:
+    def __init__(self, plot: Union[MixinLivePlot, MixinLiveBarPlot], max_points: float = inf, update_rate: float = inf,
+                 plot_rate: float = inf) -> None:
         """
         DataConnector is connecting plot with data and makes sure, that all updates are thread-safe.
         To make plot compatible and work with Connector, it must implement slot_new_data method.
@@ -36,6 +39,7 @@ class DataConnector(QObject):
         :param plot: Plot to be connected with Data
         :param max_points: Maximum amount of data points to plot
         :param float update_rate: Update rate in Hz
+        :param float plot_rate: Plot rate in Hz
         """
         super().__init__()
         if not isinstance(plot, (MixinLivePlot, MixinLiveBarPlot)):
@@ -47,6 +51,7 @@ class DataConnector(QObject):
         self.max_points = max_points
         # Calculating update timeout from update_rate frequency
         self.update_timeout = 1 / update_rate
+        self.plot_timeout = 1 / plot_rate
         if self.max_points == inf:
             # Use simple list if there is no point limits
             self.x, self.y = [], []
@@ -77,14 +82,18 @@ class DataConnector(QObject):
         self.sig_resumed.emit()
 
     def _skip_update(self) -> bool:
-        """Skip update"""
+        """Skip data update"""
         return self.paused or (time.perf_counter() - self.last_update) < self.update_timeout or self.data_lock.locked()
+
+    def _skip_plot(self) -> bool:
+        """Skip data plot"""
+        return self.paused or (time.perf_counter() - self.last_plot) < self.plot_timeout
 
     def _update_data(self, **kwargs):
         """Update data and last update time"""
         # Notify all connected plots
         self.sig_new_data.emit(self.y, self.x, kwargs)
-        self.last_update = time.perf_counter()
+        self.last_plot = time.perf_counter()
 
     def cb_set_data(self, y: List[Union[int, float]], x: List[Union[int, float]] = None, **kwargs) -> None:
         """Replace current data"""
@@ -103,7 +112,11 @@ class DataConnector(QObject):
                     self.x = deque(x, maxlen=self.max_points)
             else:
                 self.x = range(len(self.y))
-            self._update_data(**kwargs)
+
+            self.last_update = time.perf_counter()
+
+            if not self._skip_plot():
+                self._update_data(**kwargs)
 
     def cb_append_data_point(self, y: Union[int, float], x: Union[int, float] = None, **kwargs) -> None:
         """Append new data point"""
@@ -118,4 +131,8 @@ class DataConnector(QObject):
                 self.x.append(0)
             else:
                 self.x.append(self.x[-1] + 1)
-            self._update_data(**kwargs)
+
+            self.last_update = time.perf_counter()
+
+            if not self._skip_plot():
+                self._update_data(**kwargs)
