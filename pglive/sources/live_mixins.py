@@ -1,4 +1,4 @@
-from typing import List, Union, Any
+from typing import List, Union, Optional
 
 import pyqtgraph as pg
 
@@ -58,14 +58,16 @@ class MixinLeadingLine:
             _v_leading_text = pg.TextItem(color="black", angle=-90, fill=pen.color())
             _v_leading_line.setZValue(999)
             _v_leading_text.setZValue(999)
-            self._vl_kwargs = {"line": _v_leading_line, "text": _v_leading_text, "pen": pen, "text_axis": text_axis, **kwargs}
+            self._vl_kwargs = {"line": _v_leading_line, "text": _v_leading_text, "pen": pen, "text_axis": text_axis,
+                               **kwargs}
             return self._vl_kwargs
         elif orientation == LeadingLine.HORIZONTAL:
             _h_leading_line = pg.InfiniteLine(angle=0, movable=False, pen=pen)
             _h_leading_text = pg.TextItem(color="black", fill=pen.color())
             _h_leading_text.setZValue(999)
             _h_leading_text.setZValue(999)
-            self._hl_kwargs = {"line": _h_leading_line, "text": _h_leading_text, "pen": pen, "text_axis": text_axis, **kwargs}
+            self._hl_kwargs = {"line": _h_leading_line, "text": _h_leading_text, "pen": pen, "text_axis": text_axis,
+                               **kwargs}
             return self._hl_kwargs
 
     @pyqtSlot()
@@ -81,10 +83,15 @@ class MixinLeadingLine:
         return str(round(value, 4))
 
     @pyqtSlot()
-    def update_leading_text(self, x: float, y: float, x_text: str, y_text: str) -> None:
+    def update_leading_text(self, x: float, y: float, x_text: Optional[str] = None,
+                            y_text: Optional[str] = None) -> None:
         """Update position and text of Vertical and Horizontal leading text"""
         vb = self.getViewBox()
         width, height = vb.width(), vb.height()
+        if x_text is None:
+            x_text = self.x_format(x)
+        if y_text is None:
+            y_text = self.y_format(y)
 
         if self._vl_kwargs is not None:
             text_axis = x_text if self._vl_kwargs["text_axis"] == LeadingLine.AXIS_X else y_text

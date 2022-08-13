@@ -25,7 +25,7 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
 
         if self._hl_kwargs is not None:
             self._hl_kwargs["line"].setPos(self.yData[-1])
-        self.update_leading_text(self.xData[-1], self.yData[-1], str(self.xData[-1]), str(self.yData[-1]))
+        self.update_leading_text(self.xData[-1], self.yData[-1])
 
 
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
@@ -39,7 +39,7 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
         if self._hl_kwargs is not None:
             self._hl_kwargs["line"].setPos(last_point[1])
 
-        self.update_leading_text(last_point[0], last_point[1], str(last_point[0]), str(last_point[1]))
+        self.update_leading_text(last_point[0], last_point[1])
 
 
 class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
@@ -60,8 +60,7 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._vl_kwargs["line"].setPos(self.opts["width"][-1])
         if self._hl_kwargs is not None:
             self._hl_kwargs["line"].setPos(self.opts["y"][-1])
-        self.update_leading_text(self.opts["width"][-1], self.opts["y"][-1], str(self.opts["width"][-1]),
-                                 str(self.opts["y"][-1]))
+        self.update_leading_text(self.opts["width"][-1], self.opts["y"][-1])
 
 
 class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
@@ -82,8 +81,7 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._vl_kwargs["line"].setPos(self.opts["x"][-1])
         if self._hl_kwargs is not None:
             self._hl_kwargs["line"].setPos(self.opts["height"][-1])
-        self.update_leading_text(self.opts["x"][-1], self.opts["height"][-1],
-                                 str(self.opts["x"][-1]), str(self.opts["height"][-1]))
+        self.update_leading_text(self.opts["x"][-1], self.opts["height"][-1])
 
 
 def make_live(plot: pg.GraphicsObject) -> None:
