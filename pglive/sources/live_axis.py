@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 import pyqtgraph as pg
 from pyqtgraph import debug as debug, mkPen, getConfigOption
@@ -19,7 +20,7 @@ class LiveAxis(pg.AxisItem):
     """Implements live axis"""
 
     def __init__(self, orientation, pen=None, textPen=None, axisPen=None, linkView=None, parent=None, maxTickLength=-5,
-                 showValues=True, text='', units='', unitPrefix='', **kwargs):
+                 showValues=True, text='', units='', unitPrefix='', **kwargs: Any) -> None:
         super().__init__(orientation, pen=pen, textPen=textPen, linkView=linkView, parent=parent,
                          maxTickLength=maxTickLength, showValues=showValues, text=text, units=units,
                          unitPrefix=unitPrefix, **kwargs)
@@ -42,7 +43,7 @@ class LiveAxis(pg.AxisItem):
             return mkPen(getConfigOption('foreground'))
         return mkPen(self._axisPen)
 
-    def setAxisPen(self, *args, **kwargs) -> None:
+    def setAxisPen(self, *args: Any, **kwargs: Any) -> None:
         """
         Set axis pen used for drawing axis line.
         If no arguments are given, the default foreground color will be used.
@@ -66,7 +67,7 @@ class LiveAxis(pg.AxisItem):
             # No specific format
             return super().tickStrings(values, scale, spacing)
 
-    def drawPicture(self, p, axisSpec, tickSpecs, textSpecs):
+    def drawPicture(self, p, axisSpec, tickSpecs, textSpecs) -> None:
         profiler = debug.Profiler()
 
         p.setRenderHint(p.RenderHint.Antialiasing, False)

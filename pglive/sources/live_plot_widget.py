@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Union, Optional, Any
 
 import pyqtgraph as pg
 
@@ -27,7 +27,7 @@ class LivePlotWidget(pg.PlotWidget):
     sig_crosshair_out = pyqtSignal()
     sig_crosshair_in = pyqtSignal()
 
-    def __init__(self, parent=None, background='default', plotItem=None, **kwargs) -> None:
+    def __init__(self, parent=None, background: str='default', plotItem=None, **kwargs: Any) -> None:
         super().__init__(parent=parent, background=background, plotItem=plotItem, **kwargs)
         self.crosshair_enabled = kwargs.get(Crosshair.ENABLED, False)
         self.crosshair_items = []
@@ -38,7 +38,7 @@ class LivePlotWidget(pg.PlotWidget):
                                 kwargs.get(Crosshair.TEXT_KWARGS, {}))
 
         # Override addItem method
-        def addItem(*args):
+        def addItem(*args: Any) -> None:
             if hasattr(args[0], "_vl_kwargs") and args[0]._vl_kwargs is not None:
                 self.plotItem.addItem(args[0]._vl_kwargs["line"], ignoreBounds=True)
                 self.plotItem.addItem(args[0]._vl_kwargs["text"], ignoreBounds=True)

@@ -80,10 +80,11 @@ To run built-in examples, use python3 -m parameter like:
 
 # Available plot types #
 
-Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlot` (horizontal bar plot)
-and `LiveVBarPlot` (vertical bar plot).
+Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlot` (horizontal bar plot),
+`LiveVBarPlot` (vertical bar plot) and `LiveCandleStickPlot`.
 
 ![All plot types](https://i.postimg.cc/637CsKRC/pglive-allplots.gif)
+![CandleStick plot](https://i.postimg.cc/0QcmMMb0/plot-candlestick.gif)
 
 From *v0.2.0* you can use any Line, Scatter or Bar pyqgtraph with `DataConnector` directly.  
 No need to use specific `LivePlot` class.  

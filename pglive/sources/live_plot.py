@@ -1,6 +1,7 @@
+from typing import Dict, Any
+
 import numpy as np
 import pyqtgraph as pg
-from pyqtgraph import GraphicsObject
 
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiveBarPlot
 
@@ -24,7 +25,7 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
 
         if self._hl_kwargs is not None:
             self._hl_kwargs["line"].setPos(self.yData[-1])
-        self.update_leading_text(self.xData[-1], self.yData[-1])
+        self.update_leading_text(self.xData[-1], self.yData[-1], str(self.xData[-1]), str(self.yData[-1]))
 
 
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
@@ -38,52 +39,54 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
         if self._hl_kwargs is not None:
             self._hl_kwargs["line"].setPos(last_point[1])
 
-        self.update_leading_text(last_point[0], last_point[1])
+        self.update_leading_text(last_point[0], last_point[1], str(last_point[0]), str(last_point[1]))
 
 
 class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Horizontal Bar Plot"""
 
-    def __init__(self, x0=0, bar_height=1, **kwargs):
+    def __init__(self, x0: float = 0., bar_height: float = 1., **kwargs: Any) -> None:
         self.bar_height = bar_height
         self.x0 = x0
         super().__init__(x0=x0, y=[0], width=0, height=0, **kwargs)
 
-    def setData(self, x: float, y: float, kwargs: dict):
+    def setData(self, x: float, y: float, kwargs: dict) -> None:
         self.setOpts(x0=self.x0, y=x, height=self.bar_height, width=y, **kwargs)
         self.sigPlotChanged.emit()
 
     @pyqtSlot()
-    def update_leading_line(self):
+    def update_leading_line(self) -> None:
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.opts["width"][-1])
         if self._hl_kwargs is not None:
             self._hl_kwargs["line"].setPos(self.opts["y"][-1])
-        self.update_leading_text(self.opts["width"][-1], self.opts["y"][-1])
+        self.update_leading_text(self.opts["width"][-1], self.opts["y"][-1], str(self.opts["width"][-1]),
+                                 str(self.opts["y"][-1]))
 
 
 class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Vertical Bar Plot"""
 
-    def __init__(self, y0=0, bar_width=1, **kwargs):
+    def __init__(self, y0: float = 0, bar_width: float = 1, **kwargs: Any) -> None:
         self.bar_width = bar_width
         self.y0 = y0
         super().__init__(y0=y0, x=[0], width=0, height=0, **kwargs)
 
-    def setData(self, x: float, y: float, kwargs: dict):
+    def setData(self, x: float, y: float, kwargs: Dict) -> None:
         self.setOpts(y0=self.y0, x=x, height=y, width=self.bar_width, **kwargs)
         self.sigPlotChanged.emit()
 
     @pyqtSlot()
-    def update_leading_line(self):
+    def update_leading_line(self) -> None:
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.opts["x"][-1])
         if self._hl_kwargs is not None:
             self._hl_kwargs["line"].setPos(self.opts["height"][-1])
-        self.update_leading_text(self.opts["x"][-1], self.opts["height"][-1])
+        self.update_leading_text(self.opts["x"][-1], self.opts["height"][-1],
+                                 str(self.opts["x"][-1]), str(self.opts["height"][-1]))
 
 
-def make_live(plot: GraphicsObject):
+def make_live(plot: pg.GraphicsObject) -> None:
     """Convert plot into Live plot"""
     if isinstance(plot, pg.BarGraphItem):
         # Create horizontal bar plot in case of bar plot

@@ -1,3 +1,4 @@
+import random
 import signal
 import sys
 from math import sin
@@ -27,6 +28,23 @@ def sin_wave_generator(*data_connectors, flip=False):
                 data_connector.cb_append_data_point(x, sin(x * 0.025))
             else:
                 data_connector.cb_append_data_point(sin(x * 0.025), x)
+        sleep(0.01)
+
+
+def candle_generator(*data_connectors, flip=False):
+    """Sine wave generator"""
+    x = 0
+    while running:
+        x += 1
+        for data_connector in data_connectors:
+            a, b = sin(x * 0.025), sin(x * 0.020)
+            s = min(a, b) - random.randint(0, 1000) * 1e-3
+            e = max(a, b) + random.randint(0, 1000) * 1e-3
+            candle = (a, b, s, e)
+            if flip:
+                data_connector.cb_append_data_point(x, candle)
+            else:
+                data_connector.cb_append_data_point(candle, x)
         sleep(0.01)
 
 

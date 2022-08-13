@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Any
 
 import pyqtgraph as pg
 
@@ -45,7 +45,7 @@ class MixinLeadingLine:
     _vl_kwargs = None
 
     def set_leading_line(self, orientation: Union[LeadingLine.HORIZONTAL, LeadingLine.VERTICAL] = LeadingLine.VERTICAL,
-                         pen: QPen = None, text_axis: str = LeadingLine.AXIS_X) -> dict:
+                         pen: QPen = None, text_axis: str = LeadingLine.AXIS_X, **kwargs) -> dict:
         text_axis = text_axis.lower()
         assert text_axis in (LeadingLine.AXIS_X, LeadingLine.AXIS_Y)
 
@@ -58,14 +58,14 @@ class MixinLeadingLine:
             _v_leading_text = pg.TextItem(color="black", angle=-90, fill=pen.color())
             _v_leading_line.setZValue(999)
             _v_leading_text.setZValue(999)
-            self._vl_kwargs = {"line": _v_leading_line, "text": _v_leading_text, "pen": pen, "text_axis": text_axis}
+            self._vl_kwargs = {"line": _v_leading_line, "text": _v_leading_text, "pen": pen, "text_axis": text_axis, **kwargs}
             return self._vl_kwargs
         elif orientation == LeadingLine.HORIZONTAL:
             _h_leading_line = pg.InfiniteLine(angle=0, movable=False, pen=pen)
             _h_leading_text = pg.TextItem(color="black", fill=pen.color())
             _h_leading_text.setZValue(999)
             _h_leading_text.setZValue(999)
-            self._hl_kwargs = {"line": _h_leading_line, "text": _h_leading_text, "pen": pen, "text_axis": text_axis}
+            self._hl_kwargs = {"line": _h_leading_line, "text": _h_leading_text, "pen": pen, "text_axis": text_axis, **kwargs}
             return self._hl_kwargs
 
     @pyqtSlot()
@@ -81,13 +81,13 @@ class MixinLeadingLine:
         return str(round(value, 4))
 
     @pyqtSlot()
-    def update_leading_text(self, x: float, y: float) -> None:
+    def update_leading_text(self, x: float, y: float, x_text: str, y_text: str) -> None:
         """Update position and text of Vertical and Horizontal leading text"""
         vb = self.getViewBox()
         width, height = vb.width(), vb.height()
 
         if self._vl_kwargs is not None:
-            text_axis = self.x_format(x) if self._vl_kwargs["text_axis"] == LeadingLine.AXIS_X else self.y_format(y)
+            text_axis = x_text if self._vl_kwargs["text_axis"] == LeadingLine.AXIS_X else y_text
             self._vl_kwargs["text"].setText(text_axis)
             pixel_pos = vb.mapViewToScene(QPointF(x, y))
             y_pos = 0 + self._vl_kwargs["text"].boundingRect().height() + 10
@@ -95,7 +95,7 @@ class MixinLeadingLine:
             self._vl_kwargs["text"].setPos(new_pos.x(), new_pos.y())
 
         if self._hl_kwargs is not None:
-            text_axis = self.x_format(x) if self._hl_kwargs["text_axis"] == LeadingLine.AXIS_X else self.y_format(y)
+            text_axis = x_text if self._hl_kwargs["text_axis"] == LeadingLine.AXIS_X else y_text
             self._hl_kwargs["text"].setText(text_axis)
             pixel_pos = vb.mapViewToScene(QPointF(x, y))
             x_pos = width - self._hl_kwargs["text"].boundingRect().width() + 21
