@@ -2,6 +2,8 @@ from typing import Union, Optional, Any
 
 import pyqtgraph as pg
 
+from pglive.sources.live_axis import LiveAxis
+
 if pg.Qt.QT_LIB == pg.Qt.PYQT6:
     from PyQt6.QtCore import QPointF, pyqtSignal, QEvent
     from PyQt6.QtGui import QPen
@@ -28,6 +30,13 @@ class LivePlotWidget(pg.PlotWidget):
     sig_crosshair_in = pyqtSignal()
 
     def __init__(self, parent=None, background: str='default', plotItem=None, **kwargs: Any) -> None:
+        # Make sure we have LiveAxis in the bottom
+        if "axisItems" not in kwargs:
+            kwargs["axisItems"] = {"bottom": LiveAxis("bottom")}
+        elif "bottom" not in kwargs["axisItems"]:
+            kwargs["axisItems"]["bottom"] = LiveAxis("bottom")
+        assert isinstance(kwargs["axisItems"]["bottom"], LiveAxis)
+
         super().__init__(parent=parent, background=background, plotItem=plotItem, **kwargs)
         self.crosshair_enabled = kwargs.get(Crosshair.ENABLED, False)
         self.crosshair_items = []
@@ -36,6 +45,8 @@ class LivePlotWidget(pg.PlotWidget):
         if self.crosshair_enabled:
             self._add_crosshair(kwargs.get(Crosshair.LINE_PEN, None),
                                 kwargs.get(Crosshair.TEXT_KWARGS, {}))
+        self.getPlotItem().autoBtn.clicked.disconnect()
+        self.getPlotItem().autoBtn.clicked.connect(self.auto_btn_clicked)
 
         # Override addItem method
         def addItem(*args: Any) -> None:
@@ -49,6 +60,7 @@ class LivePlotWidget(pg.PlotWidget):
                 setattr(args[0], "x_format", self.x_format)
                 setattr(args[0], "y_format", self.y_format)
             self.plotItem.addItem(*args)
+            args[0].plot_widget = self
 
         self.addItem = addItem
 
@@ -159,3 +171,7 @@ class LivePlotWidget(pg.PlotWidget):
         """Show crosshair items"""
         for item in self.crosshair_items:
             item.show()
+
+    def auto_btn_clicked(self):
+        """Controls auto button"""
+        self.getPlotItem().autoBtnClicked()

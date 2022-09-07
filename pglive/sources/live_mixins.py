@@ -1,8 +1,9 @@
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict
 
 import pyqtgraph as pg
 
 from pglive.kwargs import LeadingLine
+from pglive.sources.live_plot_widget import LivePlotWidget
 
 if pg.Qt.QT_LIB == pg.Qt.PYQT6:
     from PyQt6.QtCore import pyqtSlot, pyqtSignal, QPointF
@@ -24,18 +25,26 @@ else:
 
 class MixinLivePlot:
     """Implements new_data slot for any plot"""
+    plot_widget: LivePlotWidget = None
 
-    @pyqtSlot(object, object, dict)
-    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
-        self.setData(x, y, **kwargs)
+    @pyqtSlot(object, object, dict, object)
+    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]],
+                      kwargs, tick_position_indexes: Optional[Dict] = None) -> None:
+
+        if tick_position_indexes is not None:
+            self.plot_widget.plotItem.getAxis("bottom").tick_position_indexes = x
+            self.setData(tick_position_indexes, y, **kwargs)
+        else:
+            self.setData(x, y, **kwargs)
 
 
 class MixinLiveBarPlot:
     """Implements new_data slot for Bar Plot"""
     sigPlotChanged = pyqtSignal()
 
-    @pyqtSlot(object, object, dict)
-    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
+    @pyqtSlot(object, object, dict, object)
+    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]],
+                      kwargs, tick_position_indexes: Optional[Dict] = None) -> None:
         self.setData(x, y, kwargs)
 
 

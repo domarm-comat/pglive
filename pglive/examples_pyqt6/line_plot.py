@@ -9,8 +9,13 @@ from pglive.sources.live_plot_widget import LivePlotWidget
 """
 In this example Line plot is displayed.
 """
+def ar(args, kwargs):
+    print(args)
+
 win = LivePlotWidget(title="Line Plot @ 100Hz")
+win.autoRange = ar
 plot = LiveLinePlot()
+plot.autoRange = ar
 win.addItem(plot)
 
 data_connector = DataConnector(plot, max_points=600)
