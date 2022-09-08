@@ -1,27 +1,31 @@
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, Dict
 
 import pyqtgraph as pg
+from pyqtgraph import ViewBox
 
 from pglive.sources.live_axis import LiveAxis
+from pglive.sources.utils import RangeController
 
 if pg.Qt.QT_LIB == pg.Qt.PYQT6:
-    from PyQt6.QtCore import QPointF, pyqtSignal, QEvent
+    from PyQt6.QtCore import QPointF, pyqtSignal, QEvent, pyqtSlot
     from PyQt6.QtGui import QPen
 elif pg.Qt.QT_LIB == pg.Qt.PYSIDE6:
-    from PySide6.QtCore import QPointF, QEvent
+    from PySide6.QtCore import QPointF, QEvent, pyqtSlot
     from PySide6.QtGui import QPen
     from PySide6.QtCore import Signal as pyqtSignal
 elif pg.Qt.QT_LIB == pg.Qt.PYSIDE2:
-    from PySide2.QtCore import QPointF, QEvent
+    from PySide2.QtCore import QPointF, QEvent, pyqtSlot
     from PySide2.QtGui import QPen
     from PySide2.QtCore import Signal as pyqtSignal
 else:
-    from PyQt5.QtCore import QPointF, pyqtSignal, QEvent
+    from PyQt5.QtCore import QPointF, pyqtSignal, QEvent, pyqtSlot
     from PyQt5.QtGui import QPen
 
 from pglive.kwargs import Crosshair
 
 
+# roll = math.ceil(x[-1] / 600)
+#         self.plot_widget.setXRange((roll - 1) * 600, roll * 600)
 class LivePlotWidget(pg.PlotWidget):
     """Implements main plot widget for all live plots"""
     mouse_position: Optional[QPointF] = None
@@ -29,17 +33,23 @@ class LivePlotWidget(pg.PlotWidget):
     sig_crosshair_out = pyqtSignal()
     sig_crosshair_in = pyqtSignal()
 
-    def __init__(self, parent=None, background: str='default', plotItem=None, **kwargs: Any) -> None:
+    def __init__(self, parent=None, background: str = 'default', plotItem=None,
+                 x_range_controller: Optional[RangeController] = None,
+                 y_range_controller: Optional[RangeController] = None, **kwargs: Any) -> None:
         # Make sure we have LiveAxis in the bottom
         if "axisItems" not in kwargs:
             kwargs["axisItems"] = {"bottom": LiveAxis("bottom")}
         elif "bottom" not in kwargs["axisItems"]:
             kwargs["axisItems"]["bottom"] = LiveAxis("bottom")
         assert isinstance(kwargs["axisItems"]["bottom"], LiveAxis)
+        self.x_range_controller = x_range_controller
+        self.y_range_controller = y_range_controller
+        self.manual_range = False
 
         super().__init__(parent=parent, background=background, plotItem=plotItem, **kwargs)
         self.crosshair_enabled = kwargs.get(Crosshair.ENABLED, False)
         self.crosshair_items = []
+        self.forced_ranges: Dict = {"final_range": ((0, 0), (0, 0))}
         self.crosshair_x_axis = kwargs.get(Crosshair.X_AXIS, "bottom")
         self.crosshair_y_axis = kwargs.get(Crosshair.Y_AXIS, "left")
         if self.crosshair_enabled:
@@ -62,7 +72,13 @@ class LivePlotWidget(pg.PlotWidget):
             self.plotItem.addItem(*args)
             args[0].plot_widget = self
 
+        self.disableAutoRange()
+        self.getPlotItem().vb.setRange = self.set_range
+        self.getPlotItem().vb.sigRangeChangedManually.connect(self.sm)
         self.addItem = addItem
+
+    def sm(self, *args, **kwargs):
+        self.manual_range = True
 
     def _add_crosshair(self, crosshair_pen: QPen, crosshair_text_kwargs: dict) -> None:
         """Add crosshair into plot"""
@@ -174,4 +190,41 @@ class LivePlotWidget(pg.PlotWidget):
 
     def auto_btn_clicked(self):
         """Controls auto button"""
-        self.getPlotItem().autoBtnClicked()
+        self.manual_range = False
+        # if self.rolling_x_range:
+        #     # x_range = self.plotItem.vb.state['viewRange'][0]
+        #     self.setXRange(*self.forced_ranges["final_range"][0], padding=0)
+        #     self.setYRange(*self.forced_ranges["final_range"][1], padding=0)
+        # else:
+        #     self.getPlotItem().autoBtnClicked()
+
+    @pyqtSlot(object, int)
+    def slot_roll_tick(self, data_connector, tick):
+        # self.forced_ranges[id] = (x_range, y_range)
+        # self.forced_ranges["final_range"] = (list(x_range), list(y_range))
+        # for x_range, y_range in self.forced_ranges.values():
+        #     if x_range[0] < self.forced_ranges["final_range"][0][0]:
+        #         self.forced_ranges["final_range"][0][0] = x_range[0]
+        #     if x_range[1] > self.forced_ranges["final_range"][0][1]:
+        #         self.forced_ranges["final_range"][0][1] = x_range[1]
+        #     if y_range[0] < self.forced_ranges["final_range"][1][0]:
+        #         self.forced_ranges["final_range"][1][0] = y_range[0]
+        #     if x_range[1] > self.forced_ranges["final_range"][1][1]:
+        #         self.forced_ranges["final_range"][1][1] = y_range[1]
+        # self.setXRange(*self.forced_ranges["final_range"][0])
+        #
+        if self.x_range_controller is None:
+            x_range = (min(data_connector.x), max(data_connector.x))
+        else:
+            x_range = (0, 600)
+        if self.y_range_controller is None:
+            y_range = (min(data_connector.y), max(data_connector.y))
+        else:
+            y_range = (1, 1)
+
+        if not self.manual_range:
+            self.set_range(xRange=x_range, yRange=y_range)
+
+    def set_range(self, *args, **kwargs):
+        kwargs["disableAutoRange"] = True
+        ViewBox.setRange(self.getPlotItem().vb, *args, **kwargs)

@@ -27,24 +27,18 @@ class MixinLivePlot:
     """Implements new_data slot for any plot"""
     plot_widget: LivePlotWidget = None
 
-    @pyqtSlot(object, object, dict, object)
-    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]],
-                      kwargs, tick_position_indexes: Optional[Dict] = None) -> None:
+    @pyqtSlot(object, object, dict)
+    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
 
-        if tick_position_indexes is not None:
-            self.plot_widget.plotItem.getAxis("bottom").tick_position_indexes = x
-            self.setData(tick_position_indexes, y, **kwargs)
-        else:
-            self.setData(x, y, **kwargs)
+        self.setData(x, y, **kwargs)
 
 
 class MixinLiveBarPlot:
     """Implements new_data slot for Bar Plot"""
     sigPlotChanged = pyqtSignal()
 
-    @pyqtSlot(object, object, dict, object)
-    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]],
-                      kwargs, tick_position_indexes: Optional[Dict] = None) -> None:
+    @pyqtSlot(object, object, dict)
+    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
         self.setData(x, y, kwargs)
 
 

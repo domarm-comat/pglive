@@ -12,7 +12,7 @@ In this example Line plot is displayed.
 def ar(args, kwargs):
     print(args)
 
-win = LivePlotWidget(title="Line Plot @ 100Hz")
+win = LivePlotWidget(title="Line Plot @ 100Hz", rolling_x_range=True)
 win.autoRange = ar
 plot = LiveLinePlot()
 plot.autoRange = ar
