@@ -209,12 +209,10 @@ class LivePlotWidget(pg.PlotWidget):
         if self.y_range_controller is None:
             y_range = (min(y_data), max(y_data))
         else:
-            y_range = (1, 1)
-
+            y_range = (-1, 1)
         if not self.manual_range:
             self.set_range(xRange=x_range, yRange=y_range)
 
     def set_range(self, *args, **kwargs):
         kwargs["disableAutoRange"] = True
-        a = time.time_ns()
         ViewBox.setRange(self.getPlotItem().vb, *args, **kwargs)

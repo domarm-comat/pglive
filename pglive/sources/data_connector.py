@@ -3,7 +3,7 @@ from collections import deque
 from math import inf
 from threading import Lock
 from typing import List, Union
-
+import numpy as np
 from pyqtgraph.Qt import QtCore
 
 from pglive.sources.live_plot import MixinLivePlot, MixinLiveBarPlot, make_live
@@ -88,7 +88,7 @@ class DataConnector(QtCore.QObject):
     def _update_data(self, **kwargs):
         """Update data and last update time"""
         # Notify all connected plots
-        self.sig_new_data.emit(list(self.y), list(self.x), kwargs)
+        self.sig_new_data.emit(np.asarray(self.y), np.asarray(self.x), kwargs)
         self.last_plot = time.perf_counter()
 
     def cb_set_data(self, y: List[Union[int, float]], x: List[Union[int, float]] = None, **kwargs) -> None:
