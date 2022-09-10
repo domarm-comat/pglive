@@ -4,27 +4,16 @@ from math import inf
 from threading import Lock
 from typing import List, Union
 
-from pyqtgraph.Qt import QT_LIB, PYQT6, PYSIDE2, PYSIDE6
-
-if QT_LIB == PYQT6:
-    from PyQt6.QtCore import QObject, pyqtSignal
-elif QT_LIB == PYSIDE6:
-    from PySide6.QtCore import QObject
-    from PySide6.QtCore import Signal as pyqtSignal
-elif QT_LIB == PYSIDE2:
-    from PySide2.QtCore import QObject
-    from PySide2.QtCore import Signal as pyqtSignal
-else:
-    from PyQt5.QtCore import QObject, pyqtSignal
+from pyqtgraph.Qt import QtCore
 
 from pglive.sources.live_plot import MixinLivePlot, MixinLiveBarPlot, make_live
 
 
-class DataConnector(QObject):
-    sig_new_data = pyqtSignal(object, object, dict)
-    sig_data_roll_tick = pyqtSignal(object, int)
-    sig_paused = pyqtSignal()
-    sig_resumed = pyqtSignal()
+class DataConnector(QtCore.QObject):
+    sig_new_data = QtCore.Signal(object, object, dict)
+    sig_data_roll_tick = QtCore.Signal(object, int)
+    sig_paused = QtCore.Signal()
+    sig_resumed = QtCore.Signal()
     paused = False
     # Last update time, using perf_counter for most precise counter
     last_update = 0
@@ -99,7 +88,7 @@ class DataConnector(QObject):
     def _update_data(self, **kwargs):
         """Update data and last update time"""
         # Notify all connected plots
-        self.sig_new_data.emit(self.y, self.x, kwargs)
+        self.sig_new_data.emit(list(self.y), list(self.x), kwargs)
         self.last_plot = time.perf_counter()
 
     def cb_set_data(self, y: List[Union[int, float]], x: List[Union[int, float]] = None, **kwargs) -> None:
@@ -147,12 +136,12 @@ class DataConnector(QObject):
                     self.tick_position_indexes.append(self.tick_position_indexes[-1] + 1.0)
             self.last_update = time.perf_counter()
 
-            self.sig_data_roll_tick.emit(self, self.rolling_index)
-
-            if self.rolling_index == self.max_points:
-                self.rolling_index = 0
-            else:
-                self.rolling_index += 1
-
             if not self._skip_plot():
                 self._update_data(**kwargs)
+
+                self.sig_data_roll_tick.emit(self, self.rolling_index)
+
+                if self.rolling_index == self.max_points:
+                    self.rolling_index = 0
+                else:
+                    self.rolling_index += 1

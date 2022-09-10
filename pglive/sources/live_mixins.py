@@ -1,43 +1,24 @@
-from typing import List, Union, Optional, Dict
+from typing import List, Union, Optional
 
 import pyqtgraph as pg
 
+from pyqtgraph.Qt import QtGui, QtCore
 from pglive.kwargs import LeadingLine
 from pglive.sources.live_plot_widget import LivePlotWidget
-
-if pg.Qt.QT_LIB == pg.Qt.PYQT6:
-    from PyQt6.QtCore import pyqtSlot, pyqtSignal, QPointF
-    from PyQt6.QtGui import QPen
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE6:
-    from PySide6.QtCore import QPointF
-    from PySide6.QtGui import QPen
-    from PySide6.QtCore import Signal as pyqtSignal
-    from PySide6.QtCore import Slot as pyqtSlot
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE2:
-    from PySide2.QtCore import QPointF
-    from PySide2.QtGui import QPen
-    from PySide2.QtCore import Signal as pyqtSignal
-    from PySide2.QtCore import Slot as pyqtSlot
-else:
-    from PyQt5.QtCore import pyqtSlot, pyqtSignal, QPointF
-    from PyQt5.QtGui import QPen
 
 
 class MixinLivePlot:
     """Implements new_data slot for any plot"""
     plot_widget: LivePlotWidget = None
 
-    @pyqtSlot(object, object, dict)
     def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
-
         self.setData(x, y, **kwargs)
 
 
 class MixinLiveBarPlot:
     """Implements new_data slot for Bar Plot"""
-    sigPlotChanged = pyqtSignal()
+    sigPlotChanged = QtCore.Signal()
 
-    @pyqtSlot(object, object, dict)
     def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
         self.setData(x, y, kwargs)
 
@@ -48,7 +29,7 @@ class MixinLeadingLine:
     _vl_kwargs = None
 
     def set_leading_line(self, orientation: Union[LeadingLine.HORIZONTAL, LeadingLine.VERTICAL] = LeadingLine.VERTICAL,
-                         pen: QPen = None, text_axis: str = LeadingLine.AXIS_X, **kwargs) -> dict:
+                         pen: QtGui.QPen = None, text_axis: str = LeadingLine.AXIS_X, **kwargs) -> dict:
         text_axis = text_axis.lower()
         assert text_axis in (LeadingLine.AXIS_X, LeadingLine.AXIS_Y)
 
@@ -73,7 +54,6 @@ class MixinLeadingLine:
                                **kwargs}
             return self._hl_kwargs
 
-    @pyqtSlot()
     def update_leading_line(self):
         raise NotImplementedError
 
@@ -85,7 +65,6 @@ class MixinLeadingLine:
         """Y tick format (will be overwritten when inserted in LivePlotWidget)"""
         return str(round(value, 4))
 
-    @pyqtSlot()
     def update_leading_text(self, x: float, y: float, x_text: Optional[str] = None,
                             y_text: Optional[str] = None) -> None:
         """Update position and text of Vertical and Horizontal leading text"""
@@ -99,15 +78,15 @@ class MixinLeadingLine:
         if self._vl_kwargs is not None:
             text_axis = x_text if self._vl_kwargs["text_axis"] == LeadingLine.AXIS_X else y_text
             self._vl_kwargs["text"].setText(text_axis)
-            pixel_pos = vb.mapViewToScene(QPointF(x, y))
+            pixel_pos = vb.mapViewToScene(QtCore.QPointF(x, y))
             y_pos = 0 + self._vl_kwargs["text"].boundingRect().height() + 10
-            new_pos = vb.mapSceneToView(QPointF(pixel_pos.x(), y_pos))
+            new_pos = vb.mapSceneToView(QtCore.QPointF(pixel_pos.x(), y_pos))
             self._vl_kwargs["text"].setPos(new_pos.x(), new_pos.y())
 
         if self._hl_kwargs is not None:
             text_axis = x_text if self._hl_kwargs["text_axis"] == LeadingLine.AXIS_X else y_text
             self._hl_kwargs["text"].setText(text_axis)
-            pixel_pos = vb.mapViewToScene(QPointF(x, y))
+            pixel_pos = vb.mapViewToScene(QtCore.QPointF(x, y))
             x_pos = width - self._hl_kwargs["text"].boundingRect().width() + 21
-            new_pos = vb.mapSceneToView(QPointF(x_pos, pixel_pos.y()))
+            new_pos = vb.mapSceneToView(QtCore.QPointF(x_pos, pixel_pos.y()))
             self._hl_kwargs["text"].setPos(new_pos.x(), new_pos.y())

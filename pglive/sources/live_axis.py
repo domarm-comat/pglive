@@ -1,19 +1,11 @@
 import datetime
-from typing import Any, Optional, List, Dict
+from typing import Any, Optional, List
 
 import pyqtgraph as pg
 from pyqtgraph import debug as debug, mkPen, getConfigOption
+from pyqtgraph.Qt import QtGui
 
 from pglive.kwargs import Axis
-
-if pg.Qt.QT_LIB == pg.Qt.PYQT6:
-    from PyQt6.QtGui import QPen
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE6:
-    from PySide6.QtGui import QPen
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE2:
-    from PySide2.QtGui import QPen
-else:
-    from PyQt5.QtGui import QPen
 
 
 class LiveAxis(pg.AxisItem):
@@ -38,7 +30,7 @@ class LiveAxis(pg.AxisItem):
         # Tick format
         self.tick_format = kwargs.get(Axis.TICK_FORMAT, None)
 
-    def axisPen(self) -> QPen:
+    def axisPen(self) -> QtGui.QPen:
         """Get axis pen"""
         if self._axisPen is None:
             return mkPen(getConfigOption('foreground'))
@@ -60,7 +52,7 @@ class LiveAxis(pg.AxisItem):
         """Convert ticks into final strings"""
         if self.tick_position_indexes:
             try:
-                values = [self.tick_position_indexes[int(value-1)] for value in values]
+                values = [self.tick_position_indexes[int(value - 1)] for value in values]
             except IndexError:
                 pass
         if self.tick_format == Axis.DATETIME:

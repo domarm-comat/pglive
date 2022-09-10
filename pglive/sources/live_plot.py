@@ -2,23 +2,15 @@ from typing import Dict, Any
 
 import numpy as np
 import pyqtgraph as pg
+from pyqtgraph.Qt import QtCore
 
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiveBarPlot
-
-if pg.Qt.QT_LIB == pg.Qt.PYQT6:
-    from PyQt6.QtCore import pyqtSlot
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE6:
-    from PySide6.QtCore import Slot as pyqtSlot
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE2:
-    from PySide2.QtCore import Slot as pyqtSlot
-else:
-    from PyQt5.QtCore import pyqtSlot
 
 
 class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
     """Line plot"""
+    swapping_values = False
 
-    @pyqtSlot()
     def update_leading_line(self):
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.xData[-1])
@@ -31,7 +23,6 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     """Scatter plot"""
 
-    @pyqtSlot()
     def update_leading_line(self):
         last_point = self.data[-1]
         if self._vl_kwargs is not None:
@@ -44,6 +35,7 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
 
 class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Horizontal Bar Plot"""
+    swapping_values = True
 
     def __init__(self, x0: float = 0., bar_height: float = 1., **kwargs: Any) -> None:
         self.bar_height = bar_height
@@ -54,7 +46,9 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.setOpts(x0=self.x0, y=x, height=self.bar_height, width=y, **kwargs)
         self.sigPlotChanged.emit()
 
-    @pyqtSlot()
+    def getData(self):
+        return self.opts["width"], self.opts["y"]
+
     def update_leading_line(self) -> None:
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.opts["width"][-1])
@@ -65,6 +59,7 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
 
 class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Vertical Bar Plot"""
+    swapping_values = False
 
     def __init__(self, y0: float = 0, bar_width: float = 1, **kwargs: Any) -> None:
         self.bar_width = bar_width
@@ -75,7 +70,6 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.setOpts(y0=self.y0, x=x, height=y, width=self.bar_width, **kwargs)
         self.sigPlotChanged.emit()
 
-    @pyqtSlot()
     def update_leading_line(self) -> None:
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.opts["x"][-1])

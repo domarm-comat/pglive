@@ -1,37 +1,24 @@
+import time
 from typing import Union, Optional, Any, Dict
 
 import pyqtgraph as pg
 from pyqtgraph import ViewBox
-
-from pglive.sources.live_axis import LiveAxis
-from pglive.sources.utils import RangeController
-
-if pg.Qt.QT_LIB == pg.Qt.PYQT6:
-    from PyQt6.QtCore import QPointF, pyqtSignal, QEvent, pyqtSlot
-    from PyQt6.QtGui import QPen
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE6:
-    from PySide6.QtCore import QPointF, QEvent, pyqtSlot
-    from PySide6.QtGui import QPen
-    from PySide6.QtCore import Signal as pyqtSignal
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE2:
-    from PySide2.QtCore import QPointF, QEvent, pyqtSlot
-    from PySide2.QtGui import QPen
-    from PySide2.QtCore import Signal as pyqtSignal
-else:
-    from PyQt5.QtCore import QPointF, pyqtSignal, QEvent, pyqtSlot
-    from PyQt5.QtGui import QPen
+from pyqtgraph.Qt import QtCore
+from pyqtgraph.Qt import QtGui
 
 from pglive.kwargs import Crosshair
+from pglive.sources.live_axis import LiveAxis
+from pglive.sources.utils import RangeController
 
 
 # roll = math.ceil(x[-1] / 600)
 #         self.plot_widget.setXRange((roll - 1) * 600, roll * 600)
 class LivePlotWidget(pg.PlotWidget):
     """Implements main plot widget for all live plots"""
-    mouse_position: Optional[QPointF] = None
-    sig_crosshair_moved = pyqtSignal(QPointF)
-    sig_crosshair_out = pyqtSignal()
-    sig_crosshair_in = pyqtSignal()
+    mouse_position: Optional[QtCore.QPointF] = None
+    sig_crosshair_moved = QtCore.Signal(QtCore.QPointF)
+    sig_crosshair_out = QtCore.Signal()
+    sig_crosshair_in = QtCore.Signal()
 
     def __init__(self, parent=None, background: str = 'default', plotItem=None,
                  x_range_controller: Optional[RangeController] = None,
@@ -80,7 +67,7 @@ class LivePlotWidget(pg.PlotWidget):
     def sm(self, *args, **kwargs):
         self.manual_range = True
 
-    def _add_crosshair(self, crosshair_pen: QPen, crosshair_text_kwargs: dict) -> None:
+    def _add_crosshair(self, crosshair_pen: QtGui.QPen, crosshair_text_kwargs: dict) -> None:
         """Add crosshair into plot"""
         self.vLine = pg.InfiniteLine(angle=90, movable=False, pen=crosshair_pen)
         self.hLine = pg.InfiniteLine(angle=0, movable=False, pen=crosshair_pen)
@@ -120,11 +107,11 @@ class LivePlotWidget(pg.PlotWidget):
 
             # Move X marker to position
             x_marker_point = self.plotItem.vb.mapSceneToView(
-                QPointF(x_pos, y_pos - self.x_value_label.boundingRect().height()))
+                QtCore.QPointF(x_pos, y_pos - self.x_value_label.boundingRect().height()))
             self.x_value_label.setPos(x_marker_point.x(), x_marker_point.y())
 
             # Move Y marker to position
-            y_marker_point = self.plotItem.vb.mapSceneToView(QPointF(x_pos, y_pos))
+            y_marker_point = self.plotItem.vb.mapSceneToView(QtCore.QPointF(x_pos, y_pos))
             self.y_value_label.setPos(y_marker_point.x(), y_marker_point.y())
 
             # Emit crosshair moved signal
@@ -146,7 +133,7 @@ class LivePlotWidget(pg.PlotWidget):
         except Exception:
             return str(round(value, 4))
 
-    def leaveEvent(self, ev: QEvent) -> None:
+    def leaveEvent(self, ev: QtCore.QEvent) -> None:
         """Mouse left PlotWidget"""
         if self.crosshair_enabled:
             self.hide_crosshair()
@@ -154,14 +141,14 @@ class LivePlotWidget(pg.PlotWidget):
         self.sig_crosshair_out.emit()
         super().leaveEvent(ev)
 
-    def enterEvent(self, ev: QEvent) -> None:
+    def enterEvent(self, ev: QtCore.QEvent) -> None:
         """Mouse enter PlotWidget"""
         if self.crosshair_enabled:
             self.show_crosshair()
         self.sig_crosshair_in.emit()
         super().enterEvent(ev)
 
-    def mouseMoveEvent(self, ev: QEvent) -> None:
+    def mouseMoveEvent(self, ev: QtCore.QEvent) -> None:
         """Mouse moved in PlotWidget"""
         if pg.Qt.QT_LIB == pg.Qt.PYQT6:
             ev_pos = ev.position()
@@ -173,7 +160,7 @@ class LivePlotWidget(pg.PlotWidget):
             self._update_crosshair_position()
         super().mouseMoveEvent(ev)
 
-    def paintEvent(self, ev: QEvent) -> None:
+    def paintEvent(self, ev: QtCore.QEvent) -> None:
         """Update crosshair position when replot"""
         self._update_crosshair_position()
         return super().paintEvent(ev)
@@ -198,7 +185,6 @@ class LivePlotWidget(pg.PlotWidget):
         # else:
         #     self.getPlotItem().autoBtnClicked()
 
-    @pyqtSlot(object, int)
     def slot_roll_tick(self, data_connector, tick):
         # self.forced_ranges[id] = (x_range, y_range)
         # self.forced_ranges["final_range"] = (list(x_range), list(y_range))
@@ -213,12 +199,15 @@ class LivePlotWidget(pg.PlotWidget):
         #         self.forced_ranges["final_range"][1][1] = y_range[1]
         # self.setXRange(*self.forced_ranges["final_range"][0])
         #
+        # self.xData = kargs['x'].view(np.ndarray))
+        # print(data_connector.plot.xData)
+        x_data, y_data = data_connector.plot.getData()
         if self.x_range_controller is None:
-            x_range = (min(data_connector.x), max(data_connector.x))
+            x_range = (min(x_data), max(x_data))
         else:
             x_range = (0, 600)
         if self.y_range_controller is None:
-            y_range = (min(data_connector.y), max(data_connector.y))
+            y_range = (min(y_data), max(y_data))
         else:
             y_range = (1, 1)
 
@@ -227,4 +216,5 @@ class LivePlotWidget(pg.PlotWidget):
 
     def set_range(self, *args, **kwargs):
         kwargs["disableAutoRange"] = True
+        a = time.time_ns()
         ViewBox.setRange(self.getPlotItem().vb, *args, **kwargs)
