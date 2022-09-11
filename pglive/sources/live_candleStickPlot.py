@@ -67,3 +67,6 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
 
         y_text = str([round(x, 4) for x in self.y_data[-1]])
         self.update_leading_text(last_x_point, last_y_point, y_text=y_text)
+
+    def getData(self):
+        return self.x_data, self.y_data

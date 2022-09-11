@@ -140,8 +140,4 @@ class DataConnector(QtCore.QObject):
                 self._update_data(**kwargs)
 
                 self.sig_data_roll_tick.emit(self, self.rolling_index)
-
-                if self.rolling_index == self.max_points:
-                    self.rolling_index = 0
-                else:
-                    self.rolling_index += 1
+                self.rolling_index += 1

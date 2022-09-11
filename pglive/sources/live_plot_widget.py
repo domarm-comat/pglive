@@ -1,5 +1,5 @@
-import time
-from typing import Union, Optional, Any, Dict
+from copy import copy
+from typing import Union, Optional, Any, List
 
 import pyqtgraph as pg
 from pyqtgraph import ViewBox
@@ -8,7 +8,7 @@ from pyqtgraph.Qt import QtGui
 
 from pglive.kwargs import Crosshair
 from pglive.sources.live_axis import LiveAxis
-from pglive.sources.utils import RangeController
+from pglive.sources.live_axis_range import LiveAxisRange
 
 
 # roll = math.ceil(x[-1] / 600)
@@ -21,22 +21,24 @@ class LivePlotWidget(pg.PlotWidget):
     sig_crosshair_in = QtCore.Signal()
 
     def __init__(self, parent=None, background: str = 'default', plotItem=None,
-                 x_range_controller: Optional[RangeController] = None,
-                 y_range_controller: Optional[RangeController] = None, **kwargs: Any) -> None:
+                 x_range_controller: Optional[LiveAxisRange] = None,
+                 y_range_controller: Optional[LiveAxisRange] = None, **kwargs: Any) -> None:
         # Make sure we have LiveAxis in the bottom
         if "axisItems" not in kwargs:
             kwargs["axisItems"] = {"bottom": LiveAxis("bottom")}
         elif "bottom" not in kwargs["axisItems"]:
             kwargs["axisItems"]["bottom"] = LiveAxis("bottom")
         assert isinstance(kwargs["axisItems"]["bottom"], LiveAxis)
-        self.x_range_controller = x_range_controller
-        self.y_range_controller = y_range_controller
+        self.x_range_controller = LiveAxisRange() if x_range_controller is None else x_range_controller
+        self.y_range_controller = LiveAxisRange() if y_range_controller is None else y_range_controller
         self.manual_range = False
 
         super().__init__(parent=parent, background=background, plotItem=plotItem, **kwargs)
         self.crosshair_enabled = kwargs.get(Crosshair.ENABLED, False)
         self.crosshair_items = []
-        self.forced_ranges: Dict = {"final_range": ((0, 0), (0, 0))}
+        self.final_x_range: List[float, float] = [self.viewRect().x(), self.viewRect().width()]
+        self.final_y_range: List[float, float] = [self.viewRect().y(), self.viewRect().height()]
+        self.life_ranges = {}
         self.crosshair_x_axis = kwargs.get(Crosshair.X_AXIS, "bottom")
         self.crosshair_y_axis = kwargs.get(Crosshair.Y_AXIS, "left")
         if self.crosshair_enabled:
@@ -178,40 +180,33 @@ class LivePlotWidget(pg.PlotWidget):
     def auto_btn_clicked(self):
         """Controls auto button"""
         self.manual_range = False
-        # if self.rolling_x_range:
-        #     # x_range = self.plotItem.vb.state['viewRange'][0]
-        #     self.setXRange(*self.forced_ranges["final_range"][0], padding=0)
-        #     self.setYRange(*self.forced_ranges["final_range"][1], padding=0)
-        # else:
-        #     self.getPlotItem().autoBtnClicked()
+        self.set_range(xRange=self.final_x_range, yRange=self.final_y_range)
 
     def slot_roll_tick(self, data_connector, tick):
-        # self.forced_ranges[id] = (x_range, y_range)
-        # self.forced_ranges["final_range"] = (list(x_range), list(y_range))
-        # for x_range, y_range in self.forced_ranges.values():
-        #     if x_range[0] < self.forced_ranges["final_range"][0][0]:
-        #         self.forced_ranges["final_range"][0][0] = x_range[0]
-        #     if x_range[1] > self.forced_ranges["final_range"][0][1]:
-        #         self.forced_ranges["final_range"][0][1] = x_range[1]
-        #     if y_range[0] < self.forced_ranges["final_range"][1][0]:
-        #         self.forced_ranges["final_range"][1][0] = y_range[0]
-        #     if x_range[1] > self.forced_ranges["final_range"][1][1]:
-        #         self.forced_ranges["final_range"][1][1] = y_range[1]
-        # self.setXRange(*self.forced_ranges["final_range"][0])
-        #
-        # self.xData = kargs['x'].view(np.ndarray))
-        # print(data_connector.plot.xData)
+        if self.manual_range:
+            # User manually changing zoom and pan, thus ignore any rage adjustments
+            return
+
         x_data, y_data = data_connector.plot.getData()
-        if self.x_range_controller is None:
-            x_range = (min(x_data), max(x_data))
-        else:
-            x_range = (0, 600)
-        if self.y_range_controller is None:
-            y_range = (min(y_data), max(y_data))
-        else:
-            y_range = (-1, 1)
-        if not self.manual_range:
-            self.set_range(xRange=x_range, yRange=y_range)
+        current_x_range = copy(self.final_x_range)
+        current_y_range = copy(self.final_y_range)
+
+        self.final_x_range = self.x_range_controller.get_x_range(x_data, tick)
+        self.final_y_range = self.y_range_controller.get_y_range(y_data, tick)
+        self.life_ranges[data_connector.__hash__()] = (copy(self.final_x_range), copy(self.final_y_range))
+
+        for compared_x_range, compared_y_range in self.life_ranges.values():
+            if self.final_x_range[0] > compared_x_range[0]:
+                self.final_x_range[0] = compared_x_range[0]
+            if self.final_x_range[1] < compared_x_range[1]:
+                self.final_x_range[1] = compared_x_range[1]
+            if self.final_y_range[0] > compared_y_range[0]:
+                self.final_y_range[0] = compared_y_range[0]
+            if self.final_y_range[1] < compared_y_range[1]:
+                self.final_y_range[1] = compared_y_range[1]
+
+        if self.final_x_range != current_x_range or self.final_y_range != current_y_range:
+            self.set_range(xRange=self.final_x_range, yRange=self.final_y_range)
 
     def set_range(self, *args, **kwargs):
         kwargs["disableAutoRange"] = True
