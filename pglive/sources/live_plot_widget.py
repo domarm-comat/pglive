@@ -183,10 +183,6 @@ class LivePlotWidget(pg.PlotWidget):
         self.set_range(xRange=self.final_x_range, yRange=self.final_y_range)
 
     def slot_roll_tick(self, data_connector, tick):
-        if self.manual_range:
-            # User manually changing zoom and pan, thus ignore any rage adjustments
-            return
-
         x_data, y_data = data_connector.plot.getData()
         current_x_range = copy(self.final_x_range)
         current_y_range = copy(self.final_y_range)
@@ -205,6 +201,9 @@ class LivePlotWidget(pg.PlotWidget):
             if self.final_y_range[1] < compared_y_range[1]:
                 self.final_y_range[1] = compared_y_range[1]
 
+        if self.manual_range:
+            # User manually changing zoom and pan, thus ignore any rage adjustments
+            return
         if self.final_x_range != current_x_range or self.final_y_range != current_y_range:
             self.set_range(xRange=self.final_x_range, yRange=self.final_y_range)
 

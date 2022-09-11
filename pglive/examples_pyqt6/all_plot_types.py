@@ -22,8 +22,8 @@ plots = [
 
 for title, plot in plots:
     widget = LivePlotWidget(title=f"{title} @ 50Hz",
-                            x_range_controller=LiveAxisRange(roll_on_tick=300, offset_right=1, offset_left=-1),
-                            y_range_controller=LiveAxisRange(fixed_range=(-1, 1)))
+                            x_range_controller=LiveAxisRange(roll_on_tick=300, offset_left=0, offset_right=0),
+                            )
     widget.addItem(plot)
     layout.addWidget(widget)
     args.append(DataConnector(plot, max_points=300, update_rate=100))

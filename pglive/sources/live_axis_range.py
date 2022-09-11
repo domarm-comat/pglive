@@ -16,26 +16,38 @@ class LiveAxisRange:
 
     def get_x_range(self, axis_data, tick):
         if self.fixed_range is not None:
-            return self.fixed_range
-        if tick % self.roll_on_tick == 0:
-            self.previous_x_range = (min(axis_data) - (axis_data[-1] - axis_data[0]) * self.offset_left,
-                    max(axis_data) + (axis_data[-1] - axis_data[0]) * self.offset_right)
-        elif tick == 0:
-            self.previous_x_range = axis_data[0] * self.offset_left, axis_data[1] * self.offset_right
+            self.previous_x_range = self.fixed_range
+        elif self.roll_on_tick == 1:
+            self.previous_x_range = (min(axis_data), max(axis_data))
+        elif tick % self.roll_on_tick == 0:
+            rs = int(len(axis_data) / self.roll_on_tick) * self.roll_on_tick
+            if rs == 0:
+                range_width = axis_data[-1] - axis_data[0]
+            else:
+                data_subset = axis_data[rs - self.roll_on_tick:rs]
+                range_width = data_subset[-1] - data_subset[0]
+            self.previous_x_range = (axis_data[-1] - range_width * self.offset_left,
+                                     (axis_data[-1] + range_width) + (range_width * self.offset_right))
         elif tick == 1:
-            self.previous_x_range = ((axis_data[-1] - axis_data[0]) * self.offset_left,
-                                     (axis_data[-1] - axis_data[0]) * self.roll_on_tick * self.offset_right)
+            self.previous_x_range = (float(axis_data[0]),
+                                     (axis_data[-1] - axis_data[0]) * self.roll_on_tick)
         return self.previous_x_range
 
     def get_y_range(self, axis_data, tick):
         if self.fixed_range is not None:
-            return self.fixed_range
-        if tick % self.roll_on_tick == 0:
-            self.previous_y_range = (min(axis_data) - (axis_data[-1] - axis_data[0]) * self.offset_top,
-                    max(axis_data) + (axis_data[-1] - axis_data[0]) * self.offset_bottom)
-        elif tick == 0:
-            self.previous_y_range = axis_data[0] * self.offset_top, axis_data[1] * self.offset_bottom
+            self.previous_y_range = self.fixed_range
+        elif self.roll_on_tick == 1:
+            self.previous_y_range = (min(axis_data), max(axis_data))
+        elif tick % self.roll_on_tick == 0:
+            rs = int(len(axis_data) / self.roll_on_tick) * self.roll_on_tick
+            if rs == 0:
+                range_width = axis_data[-1] - axis_data[0]
+            else:
+                data_subset = axis_data[rs - self.roll_on_tick:rs]
+                range_width = data_subset[-1] - data_subset[0]
+            self.previous_y_range = (axis_data[-1] - range_width * self.offset_bottom,
+                                     (axis_data[-1] + range_width) + (range_width * self.offset_top))
         elif tick == 1:
-            self.previous_y_range = ((axis_data[-1] - axis_data[0]) * self.offset_top,
-                                     (axis_data[-1] - axis_data[0]) * self.roll_on_tick * self.offset_bottom)
+            self.previous_y_range = (float(axis_data[0]),
+                                     (axis_data[-1] - axis_data[0]) * self.roll_on_tick)
         return self.previous_y_range
