@@ -22,6 +22,10 @@ class LiveAxisRange:
         final_range = self._get_range(axis_range, tick, (self.offset_left, self.offset_right))
         if final_range is None:
             return self.final_x_range
+        else:
+            offset_x = data_connector.plot.pos().x()
+            final_range[0] += offset_x
+            final_range[1] += offset_x
         self.x_range[data_connector.__hash__()] = copy(final_range)
         for x_range in self.x_range.values():
             if final_range[0] > x_range[0]:
@@ -37,6 +41,10 @@ class LiveAxisRange:
         final_range = self._get_range(axis_range, tick, (self.offset_bottom, self.offset_top))
         if final_range is None:
             return self.final_y_range
+        else:
+            offset_y = data_connector.plot.pos().y()
+            final_range[0] += offset_y
+            final_range[1] += offset_y
         self.y_range[data_connector.__hash__()] = final_range
         for y_range in self.y_range.values():
             if final_range[0] > y_range[0]:
