@@ -89,6 +89,19 @@ Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlo
 From *v0.2.0* you can use any Line, Scatter or Bar pyqgtraph with `DataConnector` directly.  
 No need to use specific `LivePlot` class.  
 
+# Plot speed optimizations  #
+
+Scaling plot view to plotted data has a huge impact on plotting performance.
+Re-plotting might be laggy when using high update frequencies and multiple plots.    
+To increase plotting performance, pglive introduces `LiveAxisRange`, that can be used in `LivePlotWidget`.
+User can now specify when and how is new view of plotted data calculated.
+
+Have a look in the `live_plot_range.py` example, to see how it can be used.
+
+![Range_optimization](https://i.postimg.cc/3wrMbbTY/a.gif)
+
+Introduced in *v0.4.0*
+
 # Crosshair #
 
 Pglive comes with built-in Crosshair as well.
@@ -107,7 +120,7 @@ You can choose it's color and which axis value is displayed along with it.
 To make life easier, pglive includes few axis improvements:
 
 - Colored axis line using new `axisPen` attribute
-- Time and DateTime tick format, converting timestamp into human readable format
+- Time and DateTime tick format, converting timestamp into human-readable format
 
 ![Crosshair](https://i.postimg.cc/8kr0L2YJ/pglive-axis.gif)
 

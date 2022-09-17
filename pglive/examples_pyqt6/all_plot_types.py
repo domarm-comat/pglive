@@ -1,10 +1,9 @@
-import pglive.examples_pyqt6 as examples
 from threading import Thread
 
+import pglive.examples_pyqt6 as examples
 import pyqtgraph as pg
-
 from pglive.sources.data_connector import DataConnector
-from pglive.sources.live_plot import LiveHBarPlot, LiveVBarPlot, LiveLinePlot, LiveScatterPlot
+from pglive.sources.live_plot import LiveVBarPlot, LiveLinePlot, LiveScatterPlot, LiveHBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """

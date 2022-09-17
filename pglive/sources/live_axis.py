@@ -1,19 +1,11 @@
 import datetime
-from typing import Any
+from typing import Any, Optional, List
 
 import pyqtgraph as pg
 from pyqtgraph import debug as debug, mkPen, getConfigOption
+from pyqtgraph.Qt import QtGui
 
 from pglive.kwargs import Axis
-
-if pg.Qt.QT_LIB == pg.Qt.PYQT6:
-    from PyQt6.QtGui import QPen
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE6:
-    from PySide6.QtGui import QPen
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE2:
-    from PySide2.QtGui import QPen
-else:
-    from PyQt5.QtGui import QPen
 
 
 class LiveAxis(pg.AxisItem):
@@ -21,6 +13,7 @@ class LiveAxis(pg.AxisItem):
 
     def __init__(self, orientation, pen=None, textPen=None, axisPen=None, linkView=None, parent=None, maxTickLength=-5,
                  showValues=True, text='', units='', unitPrefix='', **kwargs: Any) -> None:
+        self.tick_position_indexes: Optional[List] = None
         super().__init__(orientation, pen=pen, textPen=textPen, linkView=linkView, parent=parent,
                          maxTickLength=maxTickLength, showValues=showValues, text=text, units=units,
                          unitPrefix=unitPrefix, **kwargs)
@@ -37,7 +30,7 @@ class LiveAxis(pg.AxisItem):
         # Tick format
         self.tick_format = kwargs.get(Axis.TICK_FORMAT, None)
 
-    def axisPen(self) -> QPen:
+    def axisPen(self) -> QtGui.QPen:
         """Get axis pen"""
         if self._axisPen is None:
             return mkPen(getConfigOption('foreground'))
@@ -57,15 +50,21 @@ class LiveAxis(pg.AxisItem):
 
     def tickStrings(self, values: list, scale: float, spacing: float) -> list:
         """Convert ticks into final strings"""
+        if self.tick_position_indexes:
+            try:
+                values = [self.tick_position_indexes[int(value - 1)] for value in values]
+            except IndexError:
+                pass
         if self.tick_format == Axis.DATETIME:
             # Convert tick to Datetime
-            return [datetime.datetime.fromtimestamp(value).strftime("%Y-%m-%d %H:%M:%S") for value in values]
+            tick_strings = [datetime.datetime.fromtimestamp(value).strftime("%Y-%m-%d %H:%M:%S") for value in values]
         elif self.tick_format == Axis.TIME:
             # Convert tick to Time
-            return [datetime.datetime.fromtimestamp(value).strftime("%H:%M:%S") for value in values]
+            tick_strings = [datetime.datetime.fromtimestamp(value).strftime("%H:%M:%S") for value in values]
         else:
             # No specific format
-            return super().tickStrings(values, scale, spacing)
+            tick_strings = super().tickStrings(values, scale, spacing)
+        return tick_strings
 
     def drawPicture(self, p, axisSpec, tickSpecs, textSpecs) -> None:
         profiler = debug.Profiler()

@@ -3,27 +3,17 @@ from collections import deque
 from math import inf
 from threading import Lock
 from typing import List, Union
-
-from pyqtgraph.Qt import QT_LIB, PYQT6, PYSIDE2, PYSIDE6
-
-if QT_LIB == PYQT6:
-    from PyQt6.QtCore import QObject, pyqtSignal
-elif QT_LIB == PYSIDE6:
-    from PySide6.QtCore import QObject
-    from PySide6.QtCore import Signal as pyqtSignal
-elif QT_LIB == PYSIDE2:
-    from PySide2.QtCore import QObject
-    from PySide2.QtCore import Signal as pyqtSignal
-else:
-    from PyQt5.QtCore import QObject, pyqtSignal
+import numpy as np
+from pyqtgraph.Qt import QtCore
 
 from pglive.sources.live_plot import MixinLivePlot, MixinLiveBarPlot, make_live
 
 
-class DataConnector(QObject):
-    sig_new_data = pyqtSignal(object, object, dict)
-    sig_paused = pyqtSignal()
-    sig_resumed = pyqtSignal()
+class DataConnector(QtCore.QObject):
+    sig_new_data = QtCore.Signal(object, object, dict)
+    sig_data_roll_tick = QtCore.Signal(object, int)
+    sig_paused = QtCore.Signal()
+    sig_resumed = QtCore.Signal()
     paused = False
     # Last update time, using perf_counter for most precise counter
     last_update = 0
@@ -40,8 +30,12 @@ class DataConnector(QObject):
         :param max_points: Maximum amount of data points to plot
         :param float update_rate: Update rate in Hz
         :param float plot_rate: Plot rate in Hz
+        :param bool rolling_update: Roll plot from left again when reaching max_points
+        :param bool clear_before_rolling: Remove old values before rolling
         """
         super().__init__()
+        self.rolling_index = 0
+
         if not isinstance(plot, (MixinLivePlot, MixinLiveBarPlot)):
             # Attempt to convert plot into live if it's not already
             make_live(plot)
@@ -52,15 +46,17 @@ class DataConnector(QObject):
         # Calculating update timeout from update_rate frequency
         self.update_timeout = 1 / update_rate
         self.plot_timeout = 1 / plot_rate
+        self.tick_position_indexes = None
+        self.plot = plot
+        # Set plot and connect sig_new_data with plot.slot_new_data
+        self.sig_new_data.connect(self.plot.slot_new_data)
+        self.sig_data_roll_tick.connect(self.plot.plot_widget.slot_roll_tick)
         if self.max_points == inf:
             # Use simple list if there is no point limits
             self.x, self.y = [], []
         else:
             # Use deque with maxlen otherwise
             self.x, self.y = deque(maxlen=self.max_points), deque(maxlen=self.max_points)
-        # Set plot and connect sig_new_data with plot.slot_new_data
-        self.plot = plot
-        self.sig_new_data.connect(self.plot.slot_new_data)
 
     @property
     def max_points(self):
@@ -92,7 +88,7 @@ class DataConnector(QObject):
     def _update_data(self, **kwargs):
         """Update data and last update time"""
         # Notify all connected plots
-        self.sig_new_data.emit(self.y, self.x, kwargs)
+        self.sig_new_data.emit(np.asarray(self.y), np.asarray(self.x), kwargs)
         self.last_plot = time.perf_counter()
 
     def cb_set_data(self, y: List[Union[int, float]], x: List[Union[int, float]] = None, **kwargs) -> None:
@@ -131,8 +127,17 @@ class DataConnector(QObject):
                 self.x.append(0)
             else:
                 self.x.append(self.x[-1] + 1)
-
+            if self.tick_position_indexes is not None:
+                if len(self.tick_position_indexes) == 0:
+                    self.tick_position_indexes.append(0.0)
+                elif len(self.tick_position_indexes) == self.tick_position_indexes.maxlen:
+                    self.tick_position_indexes.rotate(-1)
+                else:
+                    self.tick_position_indexes.append(self.tick_position_indexes[-1] + 1.0)
             self.last_update = time.perf_counter()
 
             if not self._skip_plot():
                 self._update_data(**kwargs)
+
+                self.sig_data_roll_tick.emit(self, self.rolling_index)
+                self.rolling_index += 1

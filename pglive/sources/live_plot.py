@@ -1,24 +1,15 @@
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 
 import numpy as np
 import pyqtgraph as pg
+from pyqtgraph.Qt import QtCore
 
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiveBarPlot
-
-if pg.Qt.QT_LIB == pg.Qt.PYQT6:
-    from PyQt6.QtCore import pyqtSlot
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE6:
-    from PySide6.QtCore import Slot as pyqtSlot
-elif pg.Qt.QT_LIB == pg.Qt.PYSIDE2:
-    from PySide2.QtCore import Slot as pyqtSlot
-else:
-    from PyQt5.QtCore import pyqtSlot
 
 
 class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
     """Line plot"""
 
-    @pyqtSlot()
     def update_leading_line(self):
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.xData[-1])
@@ -27,11 +18,16 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.yData[-1])
         self.update_leading_text(self.xData[-1], self.yData[-1])
 
+    def data_bounds(self, ax=0, offset=0) -> Tuple:
+        x, y = self.getData()
+        if ax == 0:
+            return min(x[-offset:]), max(x[-offset:])
+        else:
+            return min(y[-offset:]), max(y[-offset:])
 
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     """Scatter plot"""
 
-    @pyqtSlot()
     def update_leading_line(self):
         last_point = self.data[-1]
         if self._vl_kwargs is not None:
@@ -41,6 +37,12 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
 
         self.update_leading_text(last_point[0], last_point[1])
 
+    def data_bounds(self, ax=0, offset=0) -> Tuple:
+        x, y = self.getData()
+        if ax == 0:
+            return min(x[-offset:]), max(x[-offset:])
+        else:
+            return min(y[-offset:]), max(y[-offset:])
 
 class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Horizontal Bar Plot"""
@@ -54,7 +56,9 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.setOpts(x0=self.x0, y=x, height=self.bar_height, width=y, **kwargs)
         self.sigPlotChanged.emit()
 
-    @pyqtSlot()
+    def getData(self):
+        return self.opts["width"], self.opts["y"]
+
     def update_leading_line(self) -> None:
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.opts["width"][-1])
@@ -62,6 +66,12 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.opts["y"][-1])
         self.update_leading_text(self.opts["width"][-1], self.opts["y"][-1])
 
+    def data_bounds(self, ax=0, offset=0) -> Tuple:
+        x, y = self.getData()
+        if ax == 0:
+            return min(x[-offset:]), max(x[-offset:])
+        else:
+            return min(y[-offset:]), max(y[-offset:])
 
 class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Vertical Bar Plot"""
@@ -75,7 +85,6 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.setOpts(y0=self.y0, x=x, height=y, width=self.bar_width, **kwargs)
         self.sigPlotChanged.emit()
 
-    @pyqtSlot()
     def update_leading_line(self) -> None:
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.opts["x"][-1])
@@ -83,6 +92,12 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.opts["height"][-1])
         self.update_leading_text(self.opts["x"][-1], self.opts["height"][-1])
 
+    def data_bounds(self, ax=0, offset=0) -> Tuple:
+        x, y = self.getData()
+        if ax == 0:
+            return min(x[-offset:]), max(x[-offset:])
+        else:
+            return min(y[-offset:]), max(y[-offset:])
 
 def make_live(plot: pg.GraphicsObject) -> None:
     """Convert plot into Live plot"""

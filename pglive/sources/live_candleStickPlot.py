@@ -15,6 +15,7 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
         pg.GraphicsObject.__init__(self)
         self.x_data = []
         self.y_data = []
+        self.output_y_data = []
         self.outline_pen = pg.mkPen(outline_color)
         self.high_brush = pg.mkBrush(high_color)
         self.low_brush = pg.mkBrush(low_color)
@@ -30,6 +31,7 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
         """y_data must be in format [[open, close, min, max], ...]"""
         self.x_data = x_data
         self.y_data = y_data
+        self.output_y_data = []
         if len(x_data) != len(y_data):
             raise Exception("Len of x_data must be the same as y_data")
 
@@ -49,6 +51,7 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
             else:
                 p.setBrush(self.high_brush)
             p.drawRect(QtCore.QRectF(t - w, open, w * 2, close - open))
+            self.output_y_data.extend([min, max])
         p.end()
 
         self.prepareGeometryChange()
@@ -67,3 +70,13 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
 
         y_text = str([round(x, 4) for x in self.y_data[-1]])
         self.update_leading_text(last_x_point, last_y_point, y_text=y_text)
+
+    def getData(self):
+        return self.x_data, self.y_data
+
+    def data_bounds(self, ax=0, offset=0) -> Tuple:
+        x, y = self.x_data, self.output_y_data
+        if ax == 0:
+            return min(x[-offset:]), max(x[-offset:])
+        else:
+            return min(y[-offset * 2:]), max(y[-offset * 2:])
