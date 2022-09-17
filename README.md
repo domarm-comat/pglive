@@ -119,7 +119,7 @@ You can choose it's color and which axis value is displayed along with it.
 To make life easier, pglive includes few axis improvements:
 
 - Colored axis line using new `axisPen` attribute
-- Time and DateTime tick format, converting timestamp into human readable format
+- Time and DateTime tick format, converting timestamp into human-readable format
 
 ![Crosshair](https://i.postimg.cc/8kr0L2YJ/pglive-axis.gif)
 
