@@ -89,6 +89,18 @@ Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlo
 From *v0.2.0* you can use any Line, Scatter or Bar pyqgtraph with `DataConnector` directly.  
 No need to use specific `LivePlot` class.  
 
+# Plot speed optimizations  #
+
+Scaling plot window to plotted data has huge impact on plotting performance. Re-plotting might be laggy when using high frequencies and multiple plots.    
+To increase plotting performance pglive introduces `LiveAxisRange`, that can be used in `LivePlotWidget`.
+User can now specify when and how is new view of plotted data is calculated.
+
+Have a look in the `live_plot_range.py` example to see how it can be used.
+
+[![a.gif](https://i.postimg.cc/3wrMbbTY/a.gif)](https://postimg.cc/bZ5FZgrB)
+
+Introduced in *v0.4.0*
+
 # Crosshair #
 
 Pglive comes with built-in Crosshair as well.
