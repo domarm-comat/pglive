@@ -1,11 +1,11 @@
 from copy import copy
-from typing import Optional, Tuple
+from typing import Optional, List
 
 
 class LiveAxisRange:
 
     def __init__(self, roll_on_tick=1, offset_left=0, offset_right=0, offset_top=0, offset_bottom=0,
-                 fixed_range: Optional[Tuple[float, float]] = None):
+                 fixed_range: Optional[List[float]] = None):
         self.roll_on_tick = roll_on_tick
         self.offset_left = offset_left
         self.offset_right = offset_right

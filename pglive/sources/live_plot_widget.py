@@ -185,14 +185,11 @@ class LivePlotWidget(pg.PlotWidget):
         final_x_range = self.x_range_controller.get_x_range(data_connector, tick)
         final_y_range = self.y_range_controller.get_y_range(data_connector, tick)
 
-        if self.manual_range:
-            # User manually changing zoom and pan, thus ignore any rage adjustments
-            return
-
         if self.final_x_range != final_x_range or self.final_y_range != final_y_range:
             self.final_x_range = final_x_range
             self.final_y_range = final_y_range
-            self.set_range(xRange=final_x_range, yRange=final_y_range)
+            if not self.manual_range:
+                self.set_range(xRange=final_x_range, yRange=final_y_range)
 
     def set_range(self, *args, **kwargs):
         kwargs["disableAutoRange"] = True
