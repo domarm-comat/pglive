@@ -91,13 +91,14 @@ No need to use specific `LivePlot` class.
 
 # Plot speed optimizations  #
 
-Scaling plot window to plotted data has huge impact on plotting performance. Re-plotting might be laggy when using high frequencies and multiple plots.    
-To increase plotting performance pglive introduces `LiveAxisRange`, that can be used in `LivePlotWidget`.
-User can now specify when and how is new view of plotted data is calculated.
+Scaling plot view to plotted data has a huge impact on plotting performance.
+Re-plotting might be laggy when using high update frequencies and multiple plots.    
+To increase plotting performance, pglive introduces `LiveAxisRange`, that can be used in `LivePlotWidget`.
+User can now specify when and how is new view of plotted data calculated.
 
-Have a look in the `live_plot_range.py` example to see how it can be used.
+Have a look in the `live_plot_range.py` example, to see how it can be used.
 
-[![a.gif](https://i.postimg.cc/3wrMbbTY/a.gif)](https://postimg.cc/bZ5FZgrB)
+![Range_optimization](https://i.postimg.cc/3wrMbbTY/a.gif)
 
 Introduced in *v0.4.0*
 
