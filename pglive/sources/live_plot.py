@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 
 import numpy as np
 import pyqtgraph as pg
@@ -9,7 +9,6 @@ from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiv
 
 class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
     """Line plot"""
-    swapping_values = False
 
     def update_leading_line(self):
         if self._vl_kwargs is not None:
@@ -19,6 +18,12 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.yData[-1])
         self.update_leading_text(self.xData[-1], self.yData[-1])
 
+    def data_bounds(self, ax=0, offset=0) -> Tuple:
+        x, y = self.getData()
+        if ax == 0:
+            return min(x[-offset:]), max(x[-offset:])
+        else:
+            return min(y[-offset:]), max(y[-offset:])
 
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     """Scatter plot"""
@@ -32,10 +37,15 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
 
         self.update_leading_text(last_point[0], last_point[1])
 
+    def data_bounds(self, ax=0, offset=0) -> Tuple:
+        x, y = self.getData()
+        if ax == 0:
+            return min(x[-offset:]), max(x[-offset:])
+        else:
+            return min(y[-offset:]), max(y[-offset:])
 
 class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Horizontal Bar Plot"""
-    swapping_values = True
 
     def __init__(self, x0: float = 0., bar_height: float = 1., **kwargs: Any) -> None:
         self.bar_height = bar_height
@@ -56,10 +66,15 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.opts["y"][-1])
         self.update_leading_text(self.opts["width"][-1], self.opts["y"][-1])
 
+    def data_bounds(self, ax=0, offset=0) -> Tuple:
+        x, y = self.getData()
+        if ax == 0:
+            return min(x[-offset:]), max(x[-offset:])
+        else:
+            return min(y[-offset:]), max(y[-offset:])
 
 class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Vertical Bar Plot"""
-    swapping_values = False
 
     def __init__(self, y0: float = 0, bar_width: float = 1, **kwargs: Any) -> None:
         self.bar_width = bar_width
@@ -77,6 +92,12 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.opts["height"][-1])
         self.update_leading_text(self.opts["x"][-1], self.opts["height"][-1])
 
+    def data_bounds(self, ax=0, offset=0) -> Tuple:
+        x, y = self.getData()
+        if ax == 0:
+            return min(x[-offset:]), max(x[-offset:])
+        else:
+            return min(y[-offset:]), max(y[-offset:])
 
 def make_live(plot: pg.GraphicsObject) -> None:
     """Convert plot into Live plot"""

@@ -1,4 +1,4 @@
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Tuple
 
 import pyqtgraph as pg
 
@@ -10,10 +10,10 @@ from pglive.sources.live_plot_widget import LivePlotWidget
 class MixinLivePlot:
     """Implements new_data slot for any plot"""
     plot_widget: LivePlotWidget = None
+    min_x, min_y, max_x, max_y = 0, 0, 0, 0
 
     def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
         self.setData(x, y, **kwargs)
-
 
 class MixinLiveBarPlot:
     """Implements new_data slot for Bar Plot"""

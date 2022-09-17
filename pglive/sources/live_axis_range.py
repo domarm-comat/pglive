@@ -1,3 +1,4 @@
+from copy import copy
 from typing import Optional, Tuple
 
 
@@ -11,43 +12,51 @@ class LiveAxisRange:
         self.offset_top = offset_top
         self.offset_bottom = offset_bottom
         self.fixed_range = fixed_range
-        self.previous_x_range = None
-        self.previous_y_range = None
+        self.x_range = {}
+        self.y_range = {}
+        self.final_x_range = [0, 0]
+        self.final_y_range = [0, 0]
 
-    def get_x_range(self, axis_data, tick):
-        if self.fixed_range is not None:
-            self.previous_x_range = self.fixed_range
-        elif self.roll_on_tick == 1:
-            self.previous_x_range = (min(axis_data), max(axis_data))
-        elif tick % self.roll_on_tick == 0:
-            rs = int(len(axis_data) / self.roll_on_tick) * self.roll_on_tick
-            if rs == 0:
-                range_width = axis_data[-1] - axis_data[0]
-            else:
-                data_subset = axis_data[rs - self.roll_on_tick:rs]
-                range_width = data_subset[-1] - data_subset[0]
-            self.previous_x_range = (axis_data[-1] - range_width * self.offset_left,
-                                     (axis_data[-1] + range_width) + (range_width * self.offset_right))
-        elif tick == 1:
-            self.previous_x_range = (float(axis_data[0]),
-                                     (axis_data[-1] - axis_data[0]) * self.roll_on_tick)
-        return self.previous_x_range
+    def get_x_range(self, data_connector, tick):
+        axis_range = data_connector.plot.data_bounds(ax=0, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
+        final_range = self._get_range(axis_range, tick, (self.offset_left, self.offset_right))
+        if final_range is None:
+            return self.final_x_range
+        self.x_range[data_connector.__hash__()] = copy(final_range)
+        for x_range in self.x_range.values():
+            if final_range[0] > x_range[0]:
+                final_range[0] = x_range[0]
+            if final_range[1] < x_range[1]:
+                final_range[1] = x_range[1]
+        if self.final_x_range != final_range:
+            self.final_x_range = final_range
+        return self.final_x_range
 
-    def get_y_range(self, axis_data, tick):
+    def get_y_range(self, data_connector, tick):
+        axis_range = data_connector.plot.data_bounds(ax=1, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
+        final_range = self._get_range(axis_range, tick, (self.offset_bottom, self.offset_top))
+        if final_range is None:
+            return self.final_y_range
+        self.y_range[data_connector.__hash__()] = final_range
+        for y_range in self.y_range.values():
+            if final_range[0] > y_range[0]:
+                final_range[0] = y_range[0]
+            if final_range[1] < y_range[1]:
+                final_range[1] = y_range[1]
+        if self.final_y_range != final_range:
+            self.final_y_range = final_range
+        return self.final_y_range
+
+    def _get_range(self, axis_range, tick, offsets):
         if self.fixed_range is not None:
-            self.previous_y_range = self.fixed_range
+            return self.fixed_range
         elif self.roll_on_tick == 1:
-            self.previous_y_range = (min(axis_data), max(axis_data))
+            return [axis_range[0], axis_range[1]]
         elif tick % self.roll_on_tick == 0:
-            rs = int(len(axis_data) / self.roll_on_tick) * self.roll_on_tick
-            if rs == 0:
-                range_width = axis_data[-1] - axis_data[0]
+            range_width = abs(axis_range[1] - axis_range[0])
+            if range_width == 0:
+                range_width = axis_range[1] * self.roll_on_tick
+                return [axis_range[1], axis_range[1] + range_width]
             else:
-                data_subset = axis_data[rs - self.roll_on_tick:rs]
-                range_width = data_subset[-1] - data_subset[0]
-            self.previous_y_range = (axis_data[-1] - range_width * self.offset_bottom,
-                                     (axis_data[-1] + range_width) + (range_width * self.offset_top))
-        elif tick == 1:
-            self.previous_y_range = (float(axis_data[0]),
-                                     (axis_data[-1] - axis_data[0]) * self.roll_on_tick)
-        return self.previous_y_range
+                return [axis_range[1] - range_width * offsets[0], (axis_range[1] + range_width) + (
+                        range_width * offsets[1])]

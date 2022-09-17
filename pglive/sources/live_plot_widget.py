@@ -1,4 +1,3 @@
-from copy import copy
 from typing import Union, Optional, Any, List
 
 import pyqtgraph as pg
@@ -177,35 +176,23 @@ class LivePlotWidget(pg.PlotWidget):
         for item in self.crosshair_items:
             item.show()
 
-    def auto_btn_clicked(self):
+    def auto_btn_clicked(self) -> None:
         """Controls auto button"""
         self.manual_range = False
         self.set_range(xRange=self.final_x_range, yRange=self.final_y_range)
 
-    def slot_roll_tick(self, data_connector, tick):
-        x_data, y_data = data_connector.plot.getData()
-        current_x_range = copy(self.final_x_range)
-        current_y_range = copy(self.final_y_range)
-
-        self.final_x_range = self.x_range_controller.get_x_range(x_data, tick)
-        self.final_y_range = self.y_range_controller.get_y_range(y_data, tick)
-        self.life_ranges[data_connector.__hash__()] = (copy(self.final_x_range), copy(self.final_y_range))
-
-        for compared_x_range, compared_y_range in self.life_ranges.values():
-            if self.final_x_range[0] > compared_x_range[0]:
-                self.final_x_range[0] = compared_x_range[0]
-            if self.final_x_range[1] < compared_x_range[1]:
-                self.final_x_range[1] = compared_x_range[1]
-            if self.final_y_range[0] > compared_y_range[0]:
-                self.final_y_range[0] = compared_y_range[0]
-            if self.final_y_range[1] < compared_y_range[1]:
-                self.final_y_range[1] = compared_y_range[1]
+    def slot_roll_tick(self, data_connector, tick: int) -> None:
+        final_x_range = self.x_range_controller.get_x_range(data_connector, tick)
+        final_y_range = self.y_range_controller.get_y_range(data_connector, tick)
 
         if self.manual_range:
             # User manually changing zoom and pan, thus ignore any rage adjustments
             return
-        if self.final_x_range != current_x_range or self.final_y_range != current_y_range:
-            self.set_range(xRange=self.final_x_range, yRange=self.final_y_range)
+
+        if self.final_x_range != final_x_range or self.final_y_range != final_y_range:
+            self.final_x_range = final_x_range
+            self.final_y_range = final_y_range
+            self.set_range(xRange=final_x_range, yRange=final_y_range)
 
     def set_range(self, *args, **kwargs):
         kwargs["disableAutoRange"] = True
