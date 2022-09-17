@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+import numpy as np
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 
@@ -77,6 +78,7 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
     def data_bounds(self, ax=0, offset=0) -> Tuple:
         x, y = self.x_data, self.output_y_data
         if ax == 0:
-            return min(x[-offset:]), max(x[-offset:])
+            sub_range = x[-offset:]
         else:
-            return min(y[-offset * 2:]), max(y[-offset * 2:])
+            sub_range = y[-offset * 2:]
+        return np.nanmin(sub_range), np.nanmax(sub_range)

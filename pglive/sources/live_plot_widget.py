@@ -10,8 +10,6 @@ from pglive.sources.live_axis import LiveAxis
 from pglive.sources.live_axis_range import LiveAxisRange
 
 
-# roll = math.ceil(x[-1] / 600)
-#         self.plot_widget.setXRange((roll - 1) * 600, roll * 600)
 class LivePlotWidget(pg.PlotWidget):
     """Implements main plot widget for all live plots"""
     mouse_position: Optional[QtCore.QPointF] = None

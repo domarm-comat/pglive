@@ -21,9 +21,10 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
     def data_bounds(self, ax=0, offset=0) -> Tuple:
         x, y = self.getData()
         if ax == 0:
-            return min(x[-offset:]), max(x[-offset:])
+            sub_range = x[-offset:]
         else:
-            return min(y[-offset:]), max(y[-offset:])
+            sub_range = y[-offset:]
+        return np.nanmin(sub_range), np.nanmax(sub_range)
 
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     """Scatter plot"""
@@ -40,9 +41,10 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     def data_bounds(self, ax=0, offset=0) -> Tuple:
         x, y = self.getData()
         if ax == 0:
-            return min(x[-offset:]), max(x[-offset:])
+            sub_range = x[-offset:]
         else:
-            return min(y[-offset:]), max(y[-offset:])
+            sub_range = y[-offset:]
+        return np.nanmin(sub_range), np.nanmax(sub_range)
 
 class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Horizontal Bar Plot"""
@@ -69,9 +71,10 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     def data_bounds(self, ax=0, offset=0) -> Tuple:
         x, y = self.getData()
         if ax == 0:
-            return min(x[-offset:]), max(x[-offset:])
+            sub_range = x[-offset:]
         else:
-            return min(y[-offset:]), max(y[-offset:])
+            sub_range = y[-offset:]
+        return np.nanmin(sub_range), np.nanmax(sub_range)
 
 class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Vertical Bar Plot"""
@@ -95,9 +98,10 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     def data_bounds(self, ax=0, offset=0) -> Tuple:
         x, y = self.getData()
         if ax == 0:
-            return min(x[-offset:]), max(x[-offset:])
+            sub_range = x[-offset:]
         else:
-            return min(y[-offset:]), max(y[-offset:])
+            sub_range = y[-offset:]
+        return np.nanmin(sub_range), np.nanmax(sub_range)
 
 def make_live(plot: pg.GraphicsObject) -> None:
     """Convert plot into Live plot"""

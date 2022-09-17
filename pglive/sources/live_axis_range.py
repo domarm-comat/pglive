@@ -60,10 +60,10 @@ class LiveAxisRange:
             return self.fixed_range
         elif self.roll_on_tick == 1:
             return [axis_range[0], axis_range[1]]
-        elif tick % self.roll_on_tick == 0:
+        elif tick % self.roll_on_tick == 0 or tick < 2:
             range_width = abs(axis_range[1] - axis_range[0])
-            if range_width == 0:
-                range_width = axis_range[1] * self.roll_on_tick
+            if tick < 2:
+                range_width = range_width * (self.roll_on_tick - (tick + 1))
                 return [axis_range[1], axis_range[1] + range_width]
             else:
                 return [axis_range[1] - range_width * offsets[0], (axis_range[1] + range_width) + (
