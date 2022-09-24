@@ -100,6 +100,13 @@ Have a look in the `live_plot_range.py` example, to see how it can be used.
 
 ![Range_optimization](https://i.postimg.cc/3wrMbbTY/a.gif)
 
+In case you want to plot wider area with LiveAxisRange you can use crop_offset_to_data flag.
+For example, you want to store 60 seconds, display 30 seconds in a view and move view every 1 second.
+You will have big empty space to the left without setting flag to True.
+Have a look into crop_offset_to_data example.
+
+![crop_offset_to_data](https://i.postimg.cc/90X40Ng7/Peek-2022-09-24-15-20.gif)
+
 Introduced in *v0.4.0*
 
 # Crosshair #
