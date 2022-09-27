@@ -3,6 +3,7 @@ from collections import deque
 from math import inf
 from threading import Lock
 from typing import List, Union
+
 import numpy as np
 from pyqtgraph.Qt import QtCore
 
@@ -20,21 +21,23 @@ class DataConnector(QtCore.QObject):
     last_plot = 0
 
     def __init__(self, plot: Union[MixinLivePlot, MixinLiveBarPlot], max_points: float = inf, update_rate: float = inf,
-                 plot_rate: float = inf) -> None:
+                 plot_rate: float = inf, ignore_auto_range: bool = False) -> None:
         """
         DataConnector is connecting plot with data and makes sure, that all updates are thread-safe.
         To make plot compatible and work with Connector, it must implement slot_new_data method.
         This can be achieved either by inheriting from LiveMixin or LiveMixinBarPlot class or DataConnector, tries to
         use make_live function and add slot in runtime.
+        Use ignore_auto_range if you have more than one plot to calculate range for only one main plot.
+        This can also improve performance for multiple plots inside one widget.
         :param plot: Plot to be connected with Data
         :param max_points: Maximum amount of data points to plot
         :param float update_rate: Update rate in Hz
         :param float plot_rate: Plot rate in Hz
-        :param bool rolling_update: Roll plot from left again when reaching max_points
-        :param bool clear_before_rolling: Remove old values before rolling
+        :param bool ignore_auto_range: If set to True auto range is not calculated when new data is acquired
         """
         super().__init__()
         self.rolling_index = 0
+        self.ignore_auto_range = ignore_auto_range
 
         if not isinstance(plot, (MixinLivePlot, MixinLiveBarPlot)):
             # Attempt to convert plot into live if it's not already

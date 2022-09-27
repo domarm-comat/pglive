@@ -180,6 +180,9 @@ class LivePlotWidget(pg.PlotWidget):
         self.set_range(xRange=self.final_x_range, yRange=self.final_y_range)
 
     def slot_roll_tick(self, data_connector, tick: int) -> None:
+        if data_connector.ignore_auto_range:
+            # Don't calculate range for this DataConnector
+            return
         final_x_range = self.x_range_controller.get_x_range(data_connector, tick)
         final_y_range = self.y_range_controller.get_y_range(data_connector, tick)
 

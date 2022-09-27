@@ -1,7 +1,7 @@
 import random
 import signal
 import sys
-from math import sin
+from math import sin, cos
 from time import sleep
 
 from PyQt5.QtGui import QColor
@@ -31,14 +31,27 @@ def sin_wave_generator(*data_connectors, flip=False):
         sleep(0.01)
 
 
+def cos_wave_generator(*data_connectors, flip=False):
+    """Sine wave generator"""
+    x = 0
+    while running:
+        x += 1
+        for data_connector in data_connectors:
+            if flip:
+                data_connector.cb_append_data_point(x, cos(x * 0.025))
+            else:
+                data_connector.cb_append_data_point(cos(x * 0.025), x)
+        sleep(0.01)
+
+
 def candle_generator(*data_connectors, flip=False):
     """Sine wave generator"""
     x = 0
     while running:
         x += 1
         for data_connector in data_connectors:
-            a,b = sin(x * 0.025), sin(x * 0.020)
-            s = min(a,b) - random.randint(0, 1000) * 1e-3
+            a, b = sin(x * 0.025), sin(x * 0.020)
+            s = min(a, b) - random.randint(0, 1000) * 1e-3
             e = max(a, b) + random.randint(0, 1000) * 1e-3
             candle = (a, b, s, e)
             if flip:
