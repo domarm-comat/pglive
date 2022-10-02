@@ -116,6 +116,8 @@ class DataConnector(QtCore.QObject):
 
             if not self._skip_plot():
                 self._update_data(**kwargs)
+                self.sig_data_roll_tick.emit(self, len(self.x) - 1)
+                self.rolling_index = len(self.x)
 
     def cb_append_data_point(self, y: Union[int, float], x: Union[int, float] = None, **kwargs) -> None:
         """Append new data point"""
@@ -141,6 +143,5 @@ class DataConnector(QtCore.QObject):
 
             if not self._skip_plot():
                 self._update_data(**kwargs)
-
                 self.sig_data_roll_tick.emit(self, self.rolling_index)
                 self.rolling_index += 1
