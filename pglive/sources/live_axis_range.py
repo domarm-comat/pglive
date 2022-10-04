@@ -82,3 +82,12 @@ class LiveAxisRange:
             else:
                 return [axis_range[1] - range_width * offsets[0], (axis_range[1] + range_width) + (
                         range_width * offsets[1])]
+
+    def reset(self, data_connector):
+        """Reset ranges"""
+        if data_connector.__hash__() in self.x_range:
+            del self.x_range[data_connector.__hash__()]
+        if data_connector.__hash__() in self.y_range:
+            del self.y_range[data_connector.__hash__()]
+        self.final_x_range = [0, 0]
+        self.final_y_range = [0, 0]

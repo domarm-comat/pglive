@@ -192,6 +192,11 @@ class LivePlotWidget(pg.PlotWidget):
             if not self.manual_range:
                 self.set_range(xRange=final_x_range, yRange=final_y_range)
 
+    def slot_connector_reset(self, data_connector):
+        """Reset both range controllers when data_connector sets new data"""
+        self.x_range_controller.reset(data_connector)
+        self.y_range_controller.reset(data_connector)
+
     def set_range(self, *args, **kwargs):
         kwargs["disableAutoRange"] = True
         ViewBox.setRange(self.getPlotItem().vb, *args, **kwargs)
