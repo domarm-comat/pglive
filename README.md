@@ -85,9 +85,7 @@ Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlo
 
 ![All plot types](https://i.postimg.cc/637CsKRC/pglive-allplots.gif)
 ![CandleStick plot](https://i.postimg.cc/0QcmMMb0/plot-candlestick.gif)
-
-From *v0.2.0* you can use any Line, Scatter or Bar pyqgtraph with `DataConnector` directly.  
-No need to use specific `LivePlot` class.  
+![live-categorized-bar.gif](https://i.postimg.cc/xqrwXXjY/live-categorized-bar.gif)
 
 # Plot speed optimizations  #
 

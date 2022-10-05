@@ -1,4 +1,5 @@
 import time
+import warnings
 from collections import deque
 from math import inf
 from threading import Lock
@@ -8,6 +9,8 @@ import numpy as np
 from pyqtgraph.Qt import QtCore
 
 from pglive.sources.live_plot import MixinLivePlot, MixinLiveBarPlot, make_live
+
+warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
 
 class DataConnector(QtCore.QObject):
@@ -96,7 +99,7 @@ class DataConnector(QtCore.QObject):
         self.sig_new_data.emit(np.asarray(self.y), np.asarray(self.x), kwargs)
         self.last_plot = time.perf_counter()
 
-    def cb_set_data(self, y: List[Union[int, float]], x: List[Union[int, float]] = None, **kwargs) -> None:
+    def cb_set_data(self, y: List[Union[int, float, List]], x: List[Union[int, float]] = None, **kwargs) -> None:
         """Replace current data"""
         if self._skip_update():
             return
@@ -122,7 +125,7 @@ class DataConnector(QtCore.QObject):
                 self.sig_data_roll_tick.emit(self, len(self.x) - 1)
                 self.rolling_index = len(self.x)
 
-    def cb_append_data_point(self, y: Union[int, float], x: Union[int, float] = None, **kwargs) -> None:
+    def cb_append_data_point(self, y: Union[int, float, List], x: Union[int, float] = None, **kwargs) -> None:
         """Append new data point"""
         if self._skip_update():
             return

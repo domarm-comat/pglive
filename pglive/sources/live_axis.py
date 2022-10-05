@@ -1,4 +1,5 @@
 import datetime
+from math import floor
 from typing import Any, Optional, List
 
 import pyqtgraph as pg
@@ -6,6 +7,7 @@ from pyqtgraph import debug as debug, mkPen, getConfigOption
 from pyqtgraph.Qt import QtGui
 
 from pglive.kwargs import Axis
+from pglive.sources.utils import get_scaled_time_duration
 
 
 class LiveAxis(pg.AxisItem):
@@ -29,6 +31,11 @@ class LiveAxis(pg.AxisItem):
             self.setAxisPen(axisPen)
         # Tick format
         self.tick_format = kwargs.get(Axis.TICK_FORMAT, None)
+        self.categories = kwargs.get(Axis.CATEGORIES, [])
+        self.df_short = kwargs.get(Axis.DURATION_FORMAT, Axis.DF_SHORT) == Axis.DF_SHORT
+        if self.tick_format == Axis.CATEGORY:
+            # Override ticks spacing and set spacing 1 with step 1
+            self.setTickSpacing(1, 1)
 
     def axisPen(self) -> QtGui.QPen:
         """Get axis pen"""
@@ -61,6 +68,18 @@ class LiveAxis(pg.AxisItem):
         elif self.tick_format == Axis.TIME:
             # Convert tick to Time
             tick_strings = [datetime.datetime.fromtimestamp(value).strftime("%H:%M:%S") for value in values]
+        elif self.tick_format == Axis.DURATION:
+            # Convert tick to Time duration
+            tick_strings = [get_scaled_time_duration(value, short=self.df_short) for value in values]
+        elif self.tick_format == Axis.CATEGORY:
+            # Convert tick to Category name
+            tick_strings = []
+            for value in values:
+                try:
+                    value += 0.5
+                    tick_strings.append(self.categories[int(value)] if floor(value) >= 0 else "")
+                except IndexError:
+                    tick_strings.append("")
         else:
             # No specific format
             tick_strings = super().tickStrings(values, scale, spacing)

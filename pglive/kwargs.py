@@ -12,7 +12,13 @@ class Axis:
     TICK_FORMAT = "Tick_Format"  # "Tick format"
     DATETIME = "DateTime"
     TIME = "Time"
-
+    CATEGORY = "Category"
+    CATEGORIES = "Categories"
+    DURATION = "Duration"
+    DURATION_FORMAT = "Duration_Format"
+    # Duration format options
+    DF_SHORT = "short"
+    DF_LONG = "long"
 
 class LeadingLine:
     HORIZONTAL = "Horizontal"
