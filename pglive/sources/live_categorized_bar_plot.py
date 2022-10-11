@@ -7,7 +7,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine
 
 
-class LiveCategrorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
+class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
     """Live categorized bar plot, plotting data [[category1, category2, ...], ...]"""
     sigPlotChanged = QtCore.Signal(object)
 

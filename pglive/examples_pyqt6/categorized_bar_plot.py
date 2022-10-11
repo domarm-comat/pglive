@@ -5,15 +5,15 @@ import pglive.examples_pyqt6 as examples
 from pglive.kwargs import Axis
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_axis import LiveAxis
-from pglive.sources.live_categorized_bar_plot import LiveCategrorizedBarPlot
+from pglive.sources.live_categorized_bar_plot import LiveCategorizedBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
 In this example Categorized Bar plot is displayed.
 """
 categories = ["On", "Off", "Idle", "Warning", "Failure"]
-plot = LiveCategrorizedBarPlot(categories,
-                               category_color={"Failure": "r", "Warning": "orange", "Off": "silver", "Idle": "blue"})
+plot = LiveCategorizedBarPlot(categories,
+                              category_color={"Failure": "r", "Warning": "orange", "Off": "silver", "Idle": "blue"})
 # Make sure to give plot.categories to Axis.CATEGORIES param (it's dynamic list)
 # If you're using static categories and your data won't yield not listed category you can use static categories list
 left_axis = LiveAxis("left", **{Axis.TICK_FORMAT: Axis.CATEGORY, Axis.CATEGORIES: plot.categories})
