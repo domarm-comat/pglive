@@ -2,7 +2,6 @@ from typing import Dict, Any, Tuple
 
 import numpy as np
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore
 
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiveBarPlot
 
@@ -26,6 +25,7 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
             sub_range = y[-offset:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
 
+
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     """Scatter plot"""
 
@@ -45,6 +45,7 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
         else:
             sub_range = y[-offset:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
+
 
 class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Horizontal Bar Plot"""
@@ -76,6 +77,7 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             sub_range = y[-offset:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
 
+
 class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Vertical Bar Plot"""
 
@@ -103,6 +105,7 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             sub_range = y[-offset:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
 
+
 def make_live(plot: pg.GraphicsObject) -> None:
     """Convert plot into Live plot"""
     if isinstance(plot, pg.BarGraphItem):
@@ -115,3 +118,16 @@ def make_live(plot: pg.GraphicsObject) -> None:
         plot.slot_new_data = lambda y, x, kwargs: plot.setData(np.array(x), np.array(y), **kwargs)
     else:
         plot.slot_new_data = lambda y, x, kwargs: plot.setData(x, y, **kwargs)
+
+    def data_bounds(ax=0, offset=0) -> Tuple:
+        x, y = plot.getData()
+        if ax == 0:
+            sub_range = x[-offset:]
+        else:
+            sub_range = y[-offset:]
+        return np.nanmin(sub_range), np.nanmax(sub_range)
+
+    plot.data_bounds = data_bounds
+
+    plot.slot_connector_reset = lambda data_connector: plot.plot_widget.slot_connector_reset(data_connector)
+    plot.slot_roll_tick = lambda data_connector, tick: plot.plot_widget.slot_roll_tick(data_connector, tick)

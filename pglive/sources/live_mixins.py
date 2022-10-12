@@ -15,13 +15,31 @@ class MixinLivePlot:
     def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
         self.setData(x, y, **kwargs)
 
+    def slot_connector_reset(self, data_connector):
+        try:
+            self.plot_widget.slot_connector_reset(data_connector)
+        except AttributeError:
+            raise Exception("Plot must be added into LivePlotWidget before setting any data.")
+
+    def slot_roll_tick(self, data_connector, tick: int) -> None:
+        try:
+            self.plot_widget.slot_roll_tick(data_connector, tick)
+        except AttributeError:
+            raise Exception("Plot must be added into LivePlotWidget before setting any data.")
+
 class MixinLiveBarPlot:
     """Implements new_data slot for Bar Plot"""
+    plot_widget: LivePlotWidget = None
     sigPlotChanged = QtCore.Signal()
 
     def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
         self.setData(x, y, kwargs)
 
+    def slot_connector_reset(self, data_connector):
+        self.plot_widget.slot_connector_reset(data_connector)
+
+    def slot_roll_tick(self, data_connector, tick: int) -> None:
+        self.plot_widget.slot_roll_tick(data_connector, tick)
 
 class MixinLeadingLine:
     """Implements leading line"""

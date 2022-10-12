@@ -57,8 +57,8 @@ class DataConnector(QtCore.QObject):
         self.plot = plot
         # Set plot and connect sig_new_data with plot.slot_new_data
         self.sig_new_data.connect(self.plot.slot_new_data)
-        self.sig_data_reset.connect(self.plot.plot_widget.slot_connector_reset)
-        self.sig_data_roll_tick.connect(self.plot.plot_widget.slot_roll_tick)
+        self.sig_data_reset.connect(self.plot.slot_connector_reset)
+        self.sig_data_roll_tick.connect(self.plot.slot_roll_tick)
         if self.max_points == inf:
             # Use simple list if there is no point limits
             self.x, self.y = [], []
