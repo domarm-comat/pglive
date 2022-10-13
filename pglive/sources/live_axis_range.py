@@ -41,6 +41,11 @@ class LiveAxisRange:
                 final_range[0] = x_range[0]
             if final_range[1] < x_range[1]:
                 final_range[1] = x_range[1]
+        if final_range[0] == final_range[1]:
+            # Pyqtgraph ViewBox.setRange doesn't like same value for min and max,
+            # therefore in that case we must set some range
+            final_range[0] -= 0.4
+            final_range[1] += 0.4
         if self.final_x_range != final_range:
             self.final_x_range = final_range
         return self.final_x_range
@@ -65,6 +70,11 @@ class LiveAxisRange:
                 final_range[0] = y_range[0]
             if final_range[1] < y_range[1]:
                 final_range[1] = y_range[1]
+        if final_range[0] == final_range[1]:
+            # Pyqtgraph ViewBox.setRange doesn't like same value for min and max,
+            # therefore in that case we must set some range
+            final_range[0] -= 0.4
+            final_range[1] += 0.4
         if self.final_y_range != final_range:
             self.final_y_range = final_range
         return self.final_y_range
