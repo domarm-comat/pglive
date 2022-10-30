@@ -6,6 +6,7 @@ from threading import Lock
 from typing import List, Union
 
 import numpy as np
+from pyqtgraph import PlotDataItem
 from pyqtgraph.Qt import QtCore
 
 from pglive.sources.live_plot import MixinLivePlot, MixinLiveBarPlot, make_live
@@ -65,6 +66,15 @@ class DataConnector(QtCore.QObject):
         else:
             # Use deque with maxlen otherwise
             self.x, self.y = deque(maxlen=self.max_points), deque(maxlen=self.max_points)
+
+        def toggle_plot_visibility(flag):
+            """Override setVisible of PlotDataItem"""
+            PlotDataItem.setVisible(self.plot, flag)
+            if flag is False:
+                self.sig_data_reset.emit(self)
+            else:
+                self.sig_data_roll_tick.emit(self, self.rolling_index)
+        self.plot.setVisible = toggle_plot_visibility
 
     @property
     def max_points(self):
