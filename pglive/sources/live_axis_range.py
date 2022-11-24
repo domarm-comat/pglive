@@ -1,11 +1,11 @@
 from copy import copy
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 
 class LiveAxisRange:
 
-    def __init__(self, roll_on_tick=1, offset_left=0, offset_right=0, offset_top=0, offset_bottom=0,
-                 fixed_range: Optional[List[float]] = None):
+    def __init__(self, roll_on_tick: int = 1, offset_left: float = 0., offset_right: float = 0., offset_top: float = 0.,
+                 offset_bottom: float = 0., fixed_range: Optional[List[float]] = None) -> None:
         self.roll_on_tick = roll_on_tick
         self.offset_left = offset_left
         self.offset_right = offset_right
@@ -20,10 +20,12 @@ class LiveAxisRange:
         self.y_range = {}
         self.final_x_range = [0, 0]
         self.final_y_range = [0, 0]
+        self.ignored_data_connectors = []
 
-    def get_x_range(self, data_connector, tick):
+    def get_x_range(self, data_connector, tick: int) -> List[float]:
         axis_range = data_connector.plot.data_bounds(ax=0, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
         x, _ = data_connector.plot.getData()
+
         final_range = self._get_range(axis_range, tick, (self.offset_left, self.offset_right))
         if final_range is None:
             return self.final_x_range
@@ -36,7 +38,9 @@ class LiveAxisRange:
         if self.crop_right_offset_to_data and final_range[1] > x[-1]:
             final_range[1] = x[-1]
         self.x_range[data_connector.__hash__()] = copy(final_range)
-        for x_range in self.x_range.values():
+        for connector_id, x_range in self.x_range.items():
+            if connector_id in self.ignored_data_connectors:
+                continue
             if final_range[0] > x_range[0]:
                 final_range[0] = x_range[0]
             if final_range[1] < x_range[1]:
@@ -50,7 +54,7 @@ class LiveAxisRange:
             self.final_x_range = final_range
         return self.final_x_range
 
-    def get_y_range(self, data_connector, tick):
+    def get_y_range(self, data_connector, tick: int) -> List[float]:
         axis_range = data_connector.plot.data_bounds(ax=1, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
         _, y = data_connector.plot.getData()
         final_range = self._get_range(axis_range, tick, (self.offset_bottom, self.offset_top))
@@ -64,8 +68,10 @@ class LiveAxisRange:
             final_range[0] = y[0]
         if self.crop_top_offset_to_data and final_range[1] > y[-1]:
             final_range[1] = y[-1]
-        self.y_range[data_connector.__hash__()] = final_range
-        for y_range in self.y_range.values():
+        self.y_range[data_connector.__hash__()] = copy(final_range)
+        for connector_id, y_range in self.y_range.items():
+            if connector_id in self.ignored_data_connectors:
+                continue
             if final_range[0] > y_range[0]:
                 final_range[0] = y_range[0]
             if final_range[1] < y_range[1]:
@@ -79,7 +85,7 @@ class LiveAxisRange:
             self.final_y_range = final_range
         return self.final_y_range
 
-    def _get_range(self, axis_range, tick, offsets):
+    def _get_range(self, axis_range: Tuple[float, float], tick: int, offsets: Tuple[float, float]) -> List[float]:
         if self.fixed_range is not None:
             return self.fixed_range
         elif self.roll_on_tick == 1:
@@ -93,11 +99,10 @@ class LiveAxisRange:
                 return [axis_range[1] - range_width * offsets[0], (axis_range[1] + range_width) + (
                         range_width * offsets[1])]
 
-    def reset(self, data_connector):
-        """Reset ranges"""
-        if data_connector.__hash__() in self.x_range:
-            del self.x_range[data_connector.__hash__()]
-        if data_connector.__hash__() in self.y_range:
-            del self.y_range[data_connector.__hash__()]
-        self.final_x_range = [0, 0]
-        self.final_y_range = [0, 0]
+    def ignore_connector(self, data_connector, flag: bool) -> None:
+        if not flag:
+            self.ignored_data_connectors.append(data_connector.__hash__())
+        else:
+            self.ignored_data_connectors.remove(data_connector.__hash__())
+        self.get_x_range(data_connector, data_connector.rolling_index)
+        self.get_y_range(data_connector, data_connector.rolling_index)

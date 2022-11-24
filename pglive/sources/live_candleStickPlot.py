@@ -76,9 +76,8 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
         return self.x_data, self.y_data
 
     def data_bounds(self, ax=0, offset=0) -> Tuple:
-        x, y = self.x_data, self.output_y_data
         if ax == 0:
-            sub_range = x[-offset:]
+            sub_range = self.x_data[-offset:]
         else:
-            sub_range = y[-offset * 2:]
+            sub_range = self.output_y_data[-offset * 2:]
         return np.nanmin(sub_range), np.nanmax(sub_range)

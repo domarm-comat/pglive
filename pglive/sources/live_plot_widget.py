@@ -180,9 +180,15 @@ class LivePlotWidget(pg.PlotWidget):
         self.set_range(xRange=self.final_x_range, yRange=self.final_y_range)
 
     def slot_roll_tick(self, data_connector, tick: int) -> None:
-        if data_connector.ignore_auto_range or not data_connector.plot.isVisible():
+        if data_connector.ignore_auto_range:
             # Don't calculate range for this DataConnector
             return
+        elif not data_connector.plot.isVisible():
+            # Calculate range for this DataConnector, but don't display plot
+            self.x_range_controller.get_x_range(data_connector, tick)
+            self.y_range_controller.get_y_range(data_connector, tick)
+            return
+
         final_x_range = self.x_range_controller.get_x_range(data_connector, tick)
         final_y_range = self.y_range_controller.get_y_range(data_connector, tick)
 
@@ -192,10 +198,10 @@ class LivePlotWidget(pg.PlotWidget):
             if not self.manual_range:
                 self.set_range(xRange=final_x_range, yRange=final_y_range)
 
-    def slot_connector_reset(self, data_connector):
+    def slot_connector_toggle(self, data_connector, flag: bool) -> None:
         """Reset both range controllers when data_connector sets new data"""
-        self.x_range_controller.reset(data_connector)
-        self.y_range_controller.reset(data_connector)
+        self.x_range_controller.ignore_connector(data_connector, flag)
+        self.y_range_controller.ignore_connector(data_connector, flag)
 
     def set_range(self, *args, **kwargs):
         kwargs["disableAutoRange"] = True

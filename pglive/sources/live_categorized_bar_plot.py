@@ -104,9 +104,8 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
         return self.x_data, self.y_data
 
     def data_bounds(self, ax=0, offset=0) -> Tuple:
-        x, y = self.x_data, range(len(self.categories))
         if ax == 0:
-            sub_range = x[-offset:]
+            sub_range = self.x_data[-offset:]
             return np.nanmin(sub_range), np.nanmax(sub_range)
         else:
             h = self.bar_height / 2

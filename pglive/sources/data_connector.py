@@ -17,7 +17,7 @@ warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 class DataConnector(QtCore.QObject):
     sig_new_data = QtCore.Signal(object, object, dict)
     sig_data_roll_tick = QtCore.Signal(object, int)
-    sig_data_reset = QtCore.Signal(object)
+    sig_data_toggle = QtCore.Signal(object, bool)
     sig_paused = QtCore.Signal()
     sig_resumed = QtCore.Signal()
     paused = False
@@ -58,7 +58,7 @@ class DataConnector(QtCore.QObject):
         self.plot = plot
         # Set plot and connect sig_new_data with plot.slot_new_data
         self.sig_new_data.connect(self.plot.slot_new_data)
-        self.sig_data_reset.connect(self.plot.slot_connector_reset)
+        self.sig_data_toggle.connect(self.plot.slot_connector_toggle)
         self.sig_data_roll_tick.connect(self.plot.slot_roll_tick)
         if self.max_points == inf:
             # Use simple list if there is no point limits
@@ -70,14 +70,12 @@ class DataConnector(QtCore.QObject):
         def toggle_plot_visibility(flag):
             """Override setVisible of PlotDataItem"""
             PlotDataItem.setVisible(self.plot, flag)
-            if flag is False:
-                self.sig_data_reset.emit(self)
-            else:
-                self.sig_data_roll_tick.emit(self, self.rolling_index)
+            self.sig_data_toggle.emit(self, flag)
+
         self.plot.setVisible = toggle_plot_visibility
 
     @property
-    def max_points(self):
+    def max_points(self) -> Union[int, float]:
         return self._max_len
 
     @max_points.setter
@@ -131,7 +129,7 @@ class DataConnector(QtCore.QObject):
 
             if not self._skip_plot():
                 self._update_data(**kwargs)
-                self.sig_data_reset.emit(self)
+                self.sig_data_toggle.emit(self)
                 self.sig_data_roll_tick.emit(self, len(self.x) - 1)
                 self.rolling_index = len(self.x)
 

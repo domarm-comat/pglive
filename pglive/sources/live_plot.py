@@ -2,6 +2,7 @@ from typing import Dict, Any, Tuple
 
 import numpy as np
 import pyqtgraph as pg
+from numpy import ndarray
 
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiveBarPlot
 
@@ -9,7 +10,7 @@ from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiv
 class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
     """Line plot"""
 
-    def update_leading_line(self):
+    def update_leading_line(self) -> None:
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.xData[-1])
 
@@ -29,7 +30,7 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     """Scatter plot"""
 
-    def update_leading_line(self):
+    def update_leading_line(self) -> None:
         last_point = self.data[-1]
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(last_point[0])
@@ -38,7 +39,7 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
 
         self.update_leading_text(last_point[0], last_point[1])
 
-    def data_bounds(self, ax=0, offset=0) -> Tuple:
+    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
         x, y = self.getData()
         if ax == 0:
             sub_range = x[-offset:]
@@ -69,7 +70,7 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.opts["y"][-1])
         self.update_leading_text(self.opts["width"][-1], self.opts["y"][-1])
 
-    def data_bounds(self, ax=0, offset=0) -> Tuple:
+    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
         x, y = self.getData()
         if ax == 0:
             sub_range = x[-offset:]
@@ -97,7 +98,7 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.opts["height"][-1])
         self.update_leading_text(self.opts["x"][-1], self.opts["height"][-1])
 
-    def data_bounds(self, ax=0, offset=0) -> Tuple:
+    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
         x, y = self.getData()
         if ax == 0:
             sub_range = x[-offset:]
@@ -119,7 +120,7 @@ def make_live(plot: pg.GraphicsObject) -> None:
     else:
         plot.slot_new_data = lambda y, x, kwargs: plot.setData(x, y, **kwargs)
 
-    def data_bounds(ax=0, offset=0) -> Tuple:
+    def data_bounds(ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
         x, y = plot.getData()
         if ax == 0:
             sub_range = x[-offset:]
@@ -128,6 +129,6 @@ def make_live(plot: pg.GraphicsObject) -> None:
         return np.nanmin(sub_range), np.nanmax(sub_range)
 
     plot.data_bounds = data_bounds
-
-    plot.slot_connector_reset = lambda data_connector: plot.plot_widget.slot_connector_reset(data_connector)
+    plot.slot_connector_toggle = lambda data_connector, flag: plot.plot_widget.slot_connector_toggle(data_connector,
+                                                                                                     flag)
     plot.slot_roll_tick = lambda data_connector, tick: plot.plot_widget.slot_roll_tick(data_connector, tick)
