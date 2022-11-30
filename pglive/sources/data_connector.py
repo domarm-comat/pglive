@@ -129,7 +129,6 @@ class DataConnector(QtCore.QObject):
 
             if not self._skip_plot():
                 self._update_data(**kwargs)
-                self.sig_data_toggle.emit(self)
                 self.sig_data_roll_tick.emit(self, len(self.x) - 1)
                 self.rolling_index = len(self.x)
 

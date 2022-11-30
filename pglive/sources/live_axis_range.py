@@ -104,5 +104,11 @@ class LiveAxisRange:
             self.ignored_data_connectors.append(data_connector.__hash__())
         else:
             self.ignored_data_connectors.remove(data_connector.__hash__())
-        self.get_x_range(data_connector, data_connector.rolling_index)
-        self.get_y_range(data_connector, data_connector.rolling_index)
+        try:
+            self.get_x_range(data_connector, data_connector.rolling_index)
+        except TypeError:
+            return None
+        try:
+            self.get_y_range(data_connector, data_connector.rolling_index)
+        except TypeError:
+            return None
