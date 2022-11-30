@@ -54,6 +54,29 @@ class LiveAxisRange:
             self.final_x_range = final_range
         return self.final_x_range
 
+    def recalculate_x_range(self):
+        final_range = None
+        for connector_id, x_range in self.x_range.items():
+            if connector_id in self.ignored_data_connectors:
+                continue
+            elif final_range is None:
+                final_range = copy(x_range)
+                continue
+            if final_range[0] > x_range[0]:
+                final_range[0] = x_range[0]
+            if final_range[1] < x_range[1]:
+                final_range[1] = x_range[1]
+        if final_range is None:
+            final_range = [0, 0]
+        if final_range[0] == final_range[1]:
+            # Pyqtgraph ViewBox.setRange doesn't like same value for min and max,
+            # therefore in that case we must set some range
+            final_range[0] -= 0.4
+            final_range[1] += 0.4
+        if self.final_x_range != final_range:
+            self.final_x_range = final_range
+        return self.final_x_range
+
     def get_y_range(self, data_connector, tick: int) -> List[float]:
         axis_range = data_connector.plot.data_bounds(ax=1, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
         _, y = data_connector.plot.getData()
@@ -76,6 +99,29 @@ class LiveAxisRange:
                 final_range[0] = y_range[0]
             if final_range[1] < y_range[1]:
                 final_range[1] = y_range[1]
+        if final_range[0] == final_range[1]:
+            # Pyqtgraph ViewBox.setRange doesn't like same value for min and max,
+            # therefore in that case we must set some range
+            final_range[0] -= 0.4
+            final_range[1] += 0.4
+        if self.final_y_range != final_range:
+            self.final_y_range = final_range
+        return self.final_y_range
+
+    def recalculate_y_range(self):
+        final_range = None
+        for connector_id, y_range in self.y_range.items():
+            if connector_id in self.ignored_data_connectors:
+                continue
+            elif final_range is None:
+                final_range = copy(y_range)
+                continue
+            if final_range[0] > y_range[0]:
+                final_range[0] = y_range[0]
+            if final_range[1] < y_range[1]:
+                final_range[1] = y_range[1]
+        if final_range is None:
+            final_range = [0, 0]
         if final_range[0] == final_range[1]:
             # Pyqtgraph ViewBox.setRange doesn't like same value for min and max,
             # therefore in that case we must set some range

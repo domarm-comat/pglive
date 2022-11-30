@@ -203,6 +203,20 @@ class LivePlotWidget(pg.PlotWidget):
         self.x_range_controller.ignore_connector(data_connector, flag)
         self.y_range_controller.ignore_connector(data_connector, flag)
 
+        """
+        After connector toggle, we must update view again.
+        Calculate new x and y range.
+        """
+        final_x_range = self.x_range_controller.recalculate_x_range()
+        final_y_range = self.y_range_controller.recalculate_y_range()
+
+        # Force to update view if x or y range changed
+        if self.final_x_range != final_x_range or self.final_y_range != final_y_range:
+            self.final_x_range = final_x_range
+            self.final_y_range = final_y_range
+            if not self.manual_range:
+                self.set_range(xRange=final_x_range, yRange=final_y_range)
+
     def set_range(self, *args, **kwargs):
         kwargs["disableAutoRange"] = True
         ViewBox.setRange(self.getPlotItem().vb, *args, **kwargs)
