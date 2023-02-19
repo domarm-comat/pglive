@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "pglive"
+version = "0.6.0"
+description = "Pyqtgraph live plot"
+authors = ["domarm <domarm@comat.sk>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.8, <3.11"
+pyqtgraph = "^0.13.1"
+
+[tool.poetry.dev-dependencies]
+mypy = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+pyqt5 = "^5.15.9"
+pyqt6 = "^6.4.2"
+pyside2 = "^5.15.2.1"
+pyside6 = "^6.4.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

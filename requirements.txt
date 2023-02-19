@@ -1,1 +1,2 @@
-pyqtgraph
+numpy==1.24.2 ; python_version >= "3.8" and python_version < "3.11"
+pyqtgraph==0.13.1 ; python_version >= "3.8" and python_version < "3.11"
