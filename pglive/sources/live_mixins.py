@@ -1,53 +1,72 @@
-from typing import List, Union, Optional, Tuple
+from typing import Union, Optional, Protocol, Dict
 
-import pyqtgraph as pg
+import pyqtgraph as pg  # type: ignore
+from pyqtgraph.Qt import QtGui, QtCore  # type: ignore
 
-from pyqtgraph.Qt import QtGui, QtCore
 from pglive.kwargs import LeadingLine
 from pglive.sources.live_plot_widget import LivePlotWidget
+from pglive.sources.utils import NUM_LIST
 
 
-class MixinLivePlot:
+class SupportsLivePlot(Protocol):
+    plot_widget: Optional[LivePlotWidget]
+    sigPlotChanged: QtCore.Signal
+    opts: Dict
+
+    def setData(self, x: NUM_LIST, y: NUM_LIST, kwargs: dict) -> None: ...
+
+    def getViewBox(self) -> pg.ViewBox: ...
+
+
+class MixinLivePlot(SupportsLivePlot):
     """Implements new_data slot for any plot"""
-    plot_widget: LivePlotWidget = None
+    plot_widget: Optional[LivePlotWidget] = None
     min_x, min_y, max_x, max_y = 0, 0, 0, 0
 
-    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
+    def slot_new_data(self, y: NUM_LIST, x: NUM_LIST, kwargs) -> None:
         self.setData(x, y, **kwargs)
 
     def slot_connector_toggle(self, data_connector, flag: bool):
-        try:
+        if self.plot_widget is not None:
             self.plot_widget.slot_connector_toggle(data_connector, flag)
-        except AttributeError:
+        else:
             raise Exception("Plot must be added into LivePlotWidget before setting any data.")
 
     def slot_roll_tick(self, data_connector, tick: int) -> None:
-        try:
+        if self.plot_widget is not None:
             self.plot_widget.slot_roll_tick(data_connector, tick)
-        except AttributeError:
+        else:
             raise Exception("Plot must be added into LivePlotWidget before setting any data.")
 
-class MixinLiveBarPlot:
+
+class MixinLiveBarPlot(SupportsLivePlot):
     """Implements new_data slot for Bar Plot"""
-    plot_widget: LivePlotWidget = None
+    plot_widget: Optional[LivePlotWidget] = None
     sigPlotChanged = QtCore.Signal()
 
-    def slot_new_data(self, y: List[Union[int, float]], x: List[Union[int, float]], kwargs) -> None:
+    def slot_new_data(self, y: NUM_LIST, x: NUM_LIST, kwargs) -> None:
         self.setData(x, y, kwargs)
 
     def slot_connector_toggle(self, data_connector, flag: bool):
-        self.plot_widget.slot_connector_toggle(data_connector, flag)
+        if self.plot_widget is not None:
+            self.plot_widget.slot_connector_toggle(data_connector, flag)
+        else:
+            raise Exception("Plot must be added into LivePlotWidget before setting any data.")
 
     def slot_roll_tick(self, data_connector, tick: int) -> None:
-        self.plot_widget.slot_roll_tick(data_connector, tick)
+        if self.plot_widget is not None:
+            self.plot_widget.slot_roll_tick(data_connector, tick)
+        else:
+            raise Exception("Plot must be added into LivePlotWidget before setting any data.")
 
-class MixinLeadingLine:
+
+class MixinLeadingLine(SupportsLivePlot):
     """Implements leading line"""
     _hl_kwargs = None
     _vl_kwargs = None
 
-    def set_leading_line(self, orientation: Union[LeadingLine.HORIZONTAL, LeadingLine.VERTICAL] = LeadingLine.VERTICAL,
-                         pen: QtGui.QPen = None, text_axis: str = LeadingLine.AXIS_X, **kwargs) -> dict:
+    def set_leading_line(self, orientation: str = LeadingLine.VERTICAL,
+                         pen: QtGui.QPen = None, text_axis: str = LeadingLine.AXIS_X, **kwargs) -> Dict:
         text_axis = text_axis.lower()
         assert text_axis in (LeadingLine.AXIS_X, LeadingLine.AXIS_Y)
 
@@ -71,6 +90,8 @@ class MixinLeadingLine:
             self._hl_kwargs = {"line": _h_leading_line, "text": _h_leading_text, "pen": pen, "text_axis": text_axis,
                                **kwargs}
             return self._hl_kwargs
+        else:
+            raise TypeError("Unsupported LeadingLine type")
 
     def update_leading_line(self):
         raise NotImplementedError
