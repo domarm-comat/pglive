@@ -2,7 +2,7 @@ import pglive.examples_pyside2 as examples
 import signal
 from threading import Thread
 
-import pyqtgraph as pg
+import pyqtgraph as pg  # type: ignore
 from PySide2.QtCore import QPointF
 from PySide2.QtWidgets import QWidget, QGridLayout, QLabel
 

@@ -5,7 +5,7 @@ from math import sin
 from threading import Thread
 from time import sleep
 
-import pyqtgraph as pg
+import pyqtgraph as pg  # type: ignore
 
 from pglive.kwargs import Axis
 from pglive.sources.data_connector import DataConnector

@@ -1,7 +1,7 @@
 import pglive.examples_pyqt5 as examples
 from threading import Thread
 
-import pyqtgraph as pg
+import pyqtgraph as pg  # type: ignore
 
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_plot import LiveHBarPlot
@@ -15,7 +15,7 @@ Plot rate is set in Hz unit.
 layout = pg.LayoutWidget()
 args = []
 # Initial rate of 100Hz
-plot_rate = 100
+plot_rate = 100.
 max_len = 600
 # Initial delta Y is 1
 bar_height = 1
@@ -25,7 +25,7 @@ for index in range(4):
     widget.addItem(plot)
     layout.addWidget(widget)
     args.append(DataConnector(plot, max_points=max_len, plot_rate=plot_rate))
-    plot_rate /= 4
+    plot_rate /= 4.
 
 layout.show()
 

@@ -2,9 +2,9 @@ import datetime
 from math import floor
 from typing import Any, Optional, List
 
-import pyqtgraph as pg
-from pyqtgraph import debug as debug, mkPen, getConfigOption
-from pyqtgraph.Qt import QtGui
+import pyqtgraph as pg  # type: ignore
+from pyqtgraph import debug as debug, mkPen, getConfigOption  # type: ignore
+from pyqtgraph.Qt import QtGui  # type: ignore
 
 from pglive.kwargs import Axis
 from pglive.sources.utils import get_scaled_time_duration
@@ -55,7 +55,7 @@ class LiveAxis(pg.AxisItem):
             self._axisPen = mkPen(getConfigOption('foreground'))
         self._updateLabel()
 
-    def tickStrings(self, values: list, scale: float, spacing: float) -> list:
+    def tickStrings(self, values: List, scale: float, spacing: float) -> List:
         """Convert ticks into final strings"""
         if self.tick_position_indexes:
             try:

@@ -1,8 +1,8 @@
+import pglive.examples_pyqt5 as examples
 from threading import Thread
 
-import pyqtgraph as pg
+import pyqtgraph as pg  # type: ignore
 
-import pglive.examples_pyqt5 as examples
 from pglive.kwargs import Axis
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_axis import LiveAxis

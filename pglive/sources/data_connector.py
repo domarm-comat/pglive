@@ -3,13 +3,15 @@ import warnings
 from collections import deque
 from math import inf
 from threading import Lock
-from typing import List, Union
+from typing import List, Union, Deque, Optional
 
 import numpy as np
-from pyqtgraph import PlotDataItem
-from pyqtgraph.Qt import QtCore
+from pyqtgraph import PlotDataItem  # type: ignore
+from pyqtgraph.Qt import QtCore  # type: ignore
 
 from pglive.sources.live_plot import MixinLivePlot, MixinLiveBarPlot, make_live
+from pglive.sources.live_plot_widget import LivePlotWidget
+from pglive.sources.utils import NUM_LIST, NUM
 
 warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
@@ -20,10 +22,10 @@ class DataConnector(QtCore.QObject):
     sig_data_toggle = QtCore.Signal(object, bool)
     sig_paused = QtCore.Signal()
     sig_resumed = QtCore.Signal()
-    paused = False
+    paused: bool = False
     # Last update time, using perf_counter for most precise counter
-    last_update = 0
-    last_plot = 0
+    last_update: float = 0.
+    last_plot: float = 0.
 
     def __init__(self, plot: Union[MixinLivePlot, MixinLiveBarPlot], max_points: float = inf, update_rate: float = inf,
                  plot_rate: float = inf, ignore_auto_range: bool = False) -> None:
@@ -60,19 +62,23 @@ class DataConnector(QtCore.QObject):
         self.sig_new_data.connect(self.plot.slot_new_data)
         self.sig_data_toggle.connect(self.plot.slot_connector_toggle)
         self.sig_data_roll_tick.connect(self.plot.slot_roll_tick)
+        self.x: Union[NUM_LIST, Deque[NUM], List]
+        self.y: Union[NUM_LIST, Deque[NUM], List]
         if self.max_points == inf:
             # Use simple list if there is no point limits
-            self.x, self.y = [], []
+            self.x = []
+            self.y = []
         else:
             # Use deque with maxlen otherwise
-            self.x, self.y = deque(maxlen=self.max_points), deque(maxlen=self.max_points)
+            self.x = deque(maxlen=int(self.max_points))
+            self.y = deque(maxlen=int(self.max_points))
 
         def toggle_plot_visibility(flag):
             """Override setVisible of PlotDataItem"""
             PlotDataItem.setVisible(self.plot, flag)
             self.sig_data_toggle.emit(self, flag)
 
-        self.plot.setVisible = toggle_plot_visibility
+        setattr(self.plot, "setVisible", toggle_plot_visibility)
 
     @property
     def max_points(self) -> Union[int, float]:
@@ -104,10 +110,13 @@ class DataConnector(QtCore.QObject):
     def _update_data(self, **kwargs):
         """Update data and last update time"""
         # Notify all connected plots
-        self.sig_new_data.emit(np.asarray(self.y), np.asarray(self.x), kwargs)
+        try:
+            self.sig_new_data.emit(np.asarray(self.y), np.asarray(self.x), kwargs)
+        except ValueError:
+            self.sig_new_data.emit(self.y, np.asarray(self.x), kwargs)
         self.last_plot = time.perf_counter()
 
-    def cb_set_data(self, y: List[Union[int, float, List]], x: List[Union[int, float]] = None, **kwargs) -> None:
+    def cb_set_data(self, y: List[Union[int, float]], x: Optional[NUM_LIST] = None, **kwargs) -> None:
         """Replace current data"""
         if self._skip_update():
             return
@@ -116,14 +125,14 @@ class DataConnector(QtCore.QObject):
             if self.max_points == inf:
                 self.y = y
             else:
-                self.y = deque(y, maxlen=self.max_points)
+                self.y = deque(y, maxlen=int(self.max_points))
             if x is not None:
                 if self.max_points == inf:
                     self.x = x
                 else:
-                    self.x = deque(x, maxlen=self.max_points)
+                    self.x = deque(x, maxlen=int(self.max_points))
             else:
-                self.x = range(len(self.y))
+                self.x = list(range(len(self.y)))
 
             self.last_update = time.perf_counter()
 
@@ -132,7 +141,7 @@ class DataConnector(QtCore.QObject):
                 self.sig_data_roll_tick.emit(self, len(self.x) - 1)
                 self.rolling_index = len(self.x)
 
-    def cb_append_data_point(self, y: Union[int, float, List], x: Union[int, float] = None, **kwargs) -> None:
+    def cb_append_data_point(self, y: Union[int, float], x: Optional[Union[int, float]] = None, **kwargs) -> None:
         """Append new data point"""
         if self._skip_update():
             return

@@ -1,14 +1,17 @@
-from typing import Union, Optional, Any, List
+from __future__ import annotations
+from typing import Union, Optional, Any, List, Dict, TYPE_CHECKING
 
-import pyqtgraph as pg
-from pyqtgraph import ViewBox
-from pyqtgraph.Qt import QtCore
-from pyqtgraph.Qt import QtGui
+import pyqtgraph as pg  # type: ignore
+from pyqtgraph import ViewBox  # type: ignore
+from pyqtgraph.Qt import QtCore  # type: ignore
+from pyqtgraph.Qt import QtGui  # type: ignore
 
 from pglive.kwargs import Crosshair
 from pglive.sources.live_axis import LiveAxis
 from pglive.sources.live_axis_range import LiveAxisRange
 
+if TYPE_CHECKING:
+    from pglive.sources.data_connector import DataConnector
 
 class LivePlotWidget(pg.PlotWidget):
     """Implements main plot widget for all live plots"""
@@ -32,10 +35,10 @@ class LivePlotWidget(pg.PlotWidget):
 
         super().__init__(parent=parent, background=background, plotItem=plotItem, **kwargs)
         self.crosshair_enabled = kwargs.get(Crosshair.ENABLED, False)
-        self.crosshair_items = []
-        self.final_x_range: List[float, float] = [self.viewRect().x(), self.viewRect().width()]
-        self.final_y_range: List[float, float] = [self.viewRect().y(), self.viewRect().height()]
-        self.life_ranges = {}
+        self.crosshair_items: List = []
+        self.final_x_range: List[float] = [self.viewRect().x(), self.viewRect().width()]
+        self.final_y_range: List[float] = [self.viewRect().y(), self.viewRect().height()]
+        self.life_ranges: Dict = {}
         self.crosshair_x_axis = kwargs.get(Crosshair.X_AXIS, "bottom")
         self.crosshair_y_axis = kwargs.get(Crosshair.Y_AXIS, "left")
         if self.crosshair_enabled:
@@ -45,7 +48,7 @@ class LivePlotWidget(pg.PlotWidget):
         self.getPlotItem().autoBtn.clicked.connect(self.auto_btn_clicked)
 
         # Override addItem method
-        def addItem(*args: Any) -> None:
+        def addItem(*args: Any, **kwargs: Any) -> None:
             if hasattr(args[0], "_vl_kwargs") and args[0]._vl_kwargs is not None:
                 self.plotItem.addItem(args[0]._vl_kwargs["line"], ignoreBounds=True)
                 self.plotItem.addItem(args[0]._vl_kwargs["text"], ignoreBounds=True)
@@ -198,7 +201,7 @@ class LivePlotWidget(pg.PlotWidget):
             if not self.manual_range:
                 self.set_range(xRange=final_x_range, yRange=final_y_range)
 
-    def slot_connector_toggle(self, data_connector, flag: bool) -> None:
+    def slot_connector_toggle(self, data_connector: DataConnector, flag: bool) -> None:
         """Reset both range controllers when data_connector sets new data"""
         self.x_range_controller.ignore_connector(data_connector, flag)
         self.y_range_controller.ignore_connector(data_connector, flag)

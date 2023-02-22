@@ -2,7 +2,7 @@ import pglive.examples_pyside6 as examples
 import signal
 from threading import Thread
 
-import pyqtgraph as pg
+import pyqtgraph as pg  # type: ignore
 from pglive.kwargs import Axis
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_axis import LiveAxis
