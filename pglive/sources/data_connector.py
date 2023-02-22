@@ -110,10 +110,13 @@ class DataConnector(QtCore.QObject):
     def _update_data(self, **kwargs):
         """Update data and last update time"""
         # Notify all connected plots
-        self.sig_new_data.emit(np.asarray(self.y), np.asarray(self.x), kwargs)
+        try:
+            self.sig_new_data.emit(np.asarray(self.y), np.asarray(self.x), kwargs)
+        except ValueError:
+            self.sig_new_data.emit(self.y, np.asarray(self.x), kwargs)
         self.last_plot = time.perf_counter()
 
-    def cb_set_data(self, y: List[Union[int, float, List]], x: Optional[NUM_LIST] = None, **kwargs) -> None:
+    def cb_set_data(self, y: List[Union[int, float]], x: Optional[NUM_LIST] = None, **kwargs) -> None:
         """Replace current data"""
         if self._skip_update():
             return
@@ -129,7 +132,7 @@ class DataConnector(QtCore.QObject):
                 else:
                     self.x = deque(x, maxlen=int(self.max_points))
             else:
-                self.x = range(len(self.y))
+                self.x = list(range(len(self.y)))
 
             self.last_update = time.perf_counter()
 
@@ -138,7 +141,7 @@ class DataConnector(QtCore.QObject):
                 self.sig_data_roll_tick.emit(self, len(self.x) - 1)
                 self.rolling_index = len(self.x)
 
-    def cb_append_data_point(self, y: Union[int, float, List], x: Optional[Union[int, float]] = None, **kwargs) -> None:
+    def cb_append_data_point(self, y: Union[int, float], x: Optional[Union[int, float]] = None, **kwargs) -> None:
         """Append new data point"""
         if self._skip_update():
             return
