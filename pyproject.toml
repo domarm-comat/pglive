@@ -1,9 +1,21 @@
 [tool.poetry]
 name = "pglive"
-version = "0.6.0"
+version = "0.6.1"
 description = "Pyqtgraph live plot"
-authors = ["domarm <domarm@comat.sk>"]
+authors = ["Martin Domaracky <domarm@comat.sk>"]
 license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/domarm-comat/pglive"
+repository = "https://github.com/domarm-comat/pglive"
+keywords = ["pyqtgraph", "realtime", "live", "plotting", "pyqt5", "pyqt6", "pyside2", "pyside6"]
+classifiers = [
+"Programming Language :: Python :: 3",
+"Operating System :: OS Independent",
+"Topic :: Software Development :: Libraries",
+"License :: OSI Approved :: MIT License",
+"Natural Language :: English",
+"Intended Audience :: Science/Research",
+]
 
 [tool.poetry.dependencies]
 python = ">=3.8, <3.11"
