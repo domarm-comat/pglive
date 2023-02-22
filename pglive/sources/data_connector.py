@@ -77,7 +77,8 @@ class DataConnector(QtCore.QObject):
             PlotDataItem.setVisible(self.plot, flag)
             self.sig_data_toggle.emit(self, flag)
 
-        self.plot.setVisible = toggle_plot_visibility
+        # self.plot.setVisible = toggle_plot_visibility
+        self.plot.__setattr__("setVisible", toggle_plot_visibility)
 
     @property
     def max_points(self) -> Union[int, float]:

@@ -1,8 +1,9 @@
-from typing import List, Tuple
+from typing import List, Tuple, Any, Dict
 
 import numpy as np
-import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
+import pyqtgraph as pg  # type: ignore
+from numpy import ndarray
+from pyqtgraph.Qt import QtCore, QtGui  # type: ignore
 
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine
 
@@ -14,21 +15,21 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
     def __init__(self, outline_color: str = "w", high_color: str = 'g', low_color: str = 'r') -> None:
         """Choose colors of candle"""
         pg.GraphicsObject.__init__(self)
-        self.x_data = []
-        self.y_data = []
-        self.output_y_data = []
+        self.x_data: List[float] = []
+        self.y_data: List[Tuple[float, ...]] = []
+        self.output_y_data: List[float] = []
         self.outline_pen = pg.mkPen(outline_color)
         self.high_brush = pg.mkBrush(high_color)
         self.low_brush = pg.mkBrush(low_color)
         self.picture = QtGui.QPicture()
 
-    def paint(self, p, *args) -> None:
+    def paint(self, p: QtGui.QPainter, *args: Any) -> None:
         p.drawPicture(0, 0, self.picture)
 
     def boundingRect(self) -> QtCore.QRect:
         return QtCore.QRectF(self.picture.boundingRect())
 
-    def setData(self, x_data: List[float], y_data: List[Tuple[float]]) -> None:
+    def setData(self, x_data: List[float], y_data: List[Tuple[float, ...]], kwargs: Dict) -> None:
         """y_data must be in format [[open, close, min, max], ...]"""
         self.x_data = x_data
         self.y_data = y_data
@@ -72,10 +73,10 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
         y_text = str([round(x, 4) for x in self.y_data[-1]])
         self.update_leading_text(last_x_point, last_y_point, y_text=y_text)
 
-    def getData(self):
+    def getData(self) -> Tuple[List[float], List[Tuple[float, ...]]]:
         return self.x_data, self.y_data
 
-    def data_bounds(self, ax=0, offset=0) -> Tuple:
+    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
         if ax == 0:
             sub_range = self.x_data[-offset:]
         else:

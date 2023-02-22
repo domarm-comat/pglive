@@ -1,4 +1,6 @@
-from typing import Union, Optional, Protocol, Dict
+from __future__ import annotations
+
+from typing import Union, Optional, Protocol, Dict, Any, TYPE_CHECKING
 
 import pyqtgraph as pg  # type: ignore
 from pyqtgraph.Qt import QtGui, QtCore  # type: ignore
@@ -7,15 +9,21 @@ from pglive.kwargs import LeadingLine
 from pglive.sources.live_plot_widget import LivePlotWidget
 from pglive.sources.utils import NUM_LIST
 
+if TYPE_CHECKING:
+    class SupportsLivePlot(Protocol):
+        plot_widget: Optional[LivePlotWidget]
+        sigPlotChanged: QtCore.Signal
+        opts: Dict
 
-class SupportsLivePlot(Protocol):
-    plot_widget: Optional[LivePlotWidget]
-    sigPlotChanged: QtCore.Signal
-    opts: Dict
+        def setData(self, x: Any, y: Any, kwargs: dict) -> None: ...
 
-    def setData(self, x: NUM_LIST, y: NUM_LIST, kwargs: dict) -> None: ...
+        def getViewBox(self) -> pg.ViewBox: ...
 
-    def getViewBox(self) -> pg.ViewBox: ...
+        def setVisible(self, flag: bool) -> None: ...
+
+else:
+    class SupportsLivePlot:
+        ...
 
 
 class MixinLivePlot(SupportsLivePlot):
@@ -24,7 +32,7 @@ class MixinLivePlot(SupportsLivePlot):
     min_x, min_y, max_x, max_y = 0, 0, 0, 0
 
     def slot_new_data(self, y: NUM_LIST, x: NUM_LIST, kwargs) -> None:
-        self.setData(x, y, **kwargs)
+        self.setData(x, y, kwargs)
 
     def slot_connector_toggle(self, data_connector, flag: bool):
         if self.plot_widget is not None:

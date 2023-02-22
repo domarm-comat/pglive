@@ -1,7 +1,7 @@
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, List
 
-import numpy as np
-import pyqtgraph as pg
+import numpy as np  # type: ignore
+import pyqtgraph as pg  # type: ignore
 from numpy import ndarray
 
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiveBarPlot
@@ -18,7 +18,7 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.yData[-1])
         self.update_leading_text(self.xData[-1], self.yData[-1])
 
-    def data_bounds(self, ax=0, offset=0) -> Tuple:
+    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple:
         x, y = self.getData()
         if ax == 0:
             sub_range = x[-offset:]
@@ -56,11 +56,11 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.x0 = x0
         super().__init__(x0=x0, y=[0], width=0, height=0, **kwargs)
 
-    def setData(self, x: float, y: float, kwargs: dict) -> None:
+    def setData(self, x: float, y: float, kwargs: Dict) -> None:
         self.setOpts(x0=self.x0, y=x, height=self.bar_height, width=y, **kwargs)
         self.sigPlotChanged.emit()
 
-    def getData(self):
+    def getData(self) -> Tuple[List[float], List[float]]:
         return self.opts["width"], self.opts["y"]
 
     def update_leading_line(self) -> None:

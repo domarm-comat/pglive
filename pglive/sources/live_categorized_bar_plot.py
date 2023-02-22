@@ -1,8 +1,8 @@
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Optional, Dict, Any
 
 import numpy as np
-import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
+import pyqtgraph as pg  # type: ignore
+from pyqtgraph.Qt import QtCore, QtGui  # type: ignore
 
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine
 
@@ -14,10 +14,9 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
     def __init__(self, categories: Optional[List[str]] = None, category_color: Optional[Dict[str, str]] = None,
                  bar_height: float = 0.9) -> None:
         pg.GraphicsObject.__init__(self)
-        self.x_data = []
-        self.y_data = []
+        self.x_data: List[float] = []
+        self.y_data: List[Tuple[str]] = []
         self.bar_height = bar_height
-        self.output_y_data = []
         self.outline_pen = pg.mkPen("w")
         self.bar_brush = pg.mkBrush("g")
         self.categories = categories if categories is not None else []
@@ -34,17 +33,16 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
         assert 0 <= new_bar_height <= 1
         self._bar_height = new_bar_height
 
-    def paint(self, p, *args) -> None:
+    def paint(self, p: QtGui.QPainter, *args: Any) -> None:
         p.drawPicture(0, 0, self.picture)
 
     def boundingRect(self) -> QtCore.QRect:
         return QtCore.QRectF(self.picture.boundingRect())
 
-    def setData(self, x_data: List[float], y_data: List[Tuple[str]]) -> None:
+    def setData(self, x_data: List[float], y_data: List[Tuple[str]], kwargs: Dict) -> None:
         """y_data must be in format [[category1, category2, ...], ...]"""
         self.x_data = x_data
         self.y_data = y_data
-        self.output_y_data = []
         if len(x_data) != len(y_data):
             raise Exception("Len of x_data must be the same as y_data")
 
@@ -103,7 +101,7 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
     def getData(self):
         return self.x_data, self.y_data
 
-    def data_bounds(self, ax=0, offset=0) -> Tuple:
+    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple:
         if ax == 0:
             sub_range = self.x_data[-offset:]
             return np.nanmin(sub_range), np.nanmax(sub_range)

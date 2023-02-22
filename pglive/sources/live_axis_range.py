@@ -1,5 +1,5 @@
 from copy import copy
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict
 
 
 class LiveAxisRange:
@@ -16,11 +16,11 @@ class LiveAxisRange:
         self.crop_top_offset_to_data = False
         self.crop_bottom_offset_to_data = False
         self.fixed_range = fixed_range
-        self.x_range = {}
-        self.y_range = {}
-        self.final_x_range = [0, 0]
-        self.final_y_range = [0, 0]
-        self.ignored_data_connectors = []
+        self.x_range: Dict[str, List[float]] = {}
+        self.y_range: Dict[str, List[float]] = {}
+        self.final_x_range = [0., 0.]
+        self.final_y_range = [0., 0.]
+        self.ignored_data_connectors: List[str] = []
 
     def get_x_range(self, data_connector, tick: int) -> List[float]:
         axis_range = data_connector.plot.data_bounds(ax=0, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
@@ -131,7 +131,8 @@ class LiveAxisRange:
             self.final_y_range = final_range
         return self.final_y_range
 
-    def _get_range(self, axis_range: Tuple[float, float], tick: int, offsets: Tuple[float, float]) -> List[float]:
+    def _get_range(self, axis_range: Tuple[float, float], tick: int, offsets: Tuple[float, float]) -> Optional[
+        List[float]]:
         if self.fixed_range is not None:
             return self.fixed_range
         elif self.roll_on_tick == 1:
@@ -144,6 +145,8 @@ class LiveAxisRange:
             else:
                 return [axis_range[1] - range_width * offsets[0], (axis_range[1] + range_width) + (
                         range_width * offsets[1])]
+        else:
+            return None
 
     def ignore_connector(self, data_connector, flag: bool) -> None:
         if not flag:
