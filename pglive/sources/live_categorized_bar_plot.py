@@ -39,7 +39,7 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
     def boundingRect(self) -> QtCore.QRect:
         return QtCore.QRectF(self.picture.boundingRect())
 
-    def setData(self, x_data: List[float], y_data: List[Tuple[str]], kwargs: Dict) -> None:
+    def setData(self, x_data: List[float], y_data: List[Tuple[str]], **kwargs: Dict) -> None:
         """y_data must be in format [[category1, category2, ...], ...]"""
         self.x_data = x_data
         self.y_data = y_data

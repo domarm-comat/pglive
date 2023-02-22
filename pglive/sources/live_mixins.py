@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Optional, Protocol, Dict, Any, TYPE_CHECKING
+from typing import Union, Optional, Protocol, Dict, Any, TYPE_CHECKING, List, Tuple
 
 import pyqtgraph as pg  # type: ignore
 from pyqtgraph.Qt import QtGui, QtCore  # type: ignore
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
         sigPlotChanged: QtCore.Signal
         opts: Dict
 
-        def setData(self, x: Any, y: Any, kwargs: dict) -> None: ...
+        def setData(self, x_data: Any, y_data: Any, **kwargs: Dict) -> None: ...
 
         def getViewBox(self) -> pg.ViewBox: ...
 
@@ -31,8 +31,8 @@ class MixinLivePlot(SupportsLivePlot):
     plot_widget: Optional[LivePlotWidget] = None
     min_x, min_y, max_x, max_y = 0, 0, 0, 0
 
-    def slot_new_data(self, y: NUM_LIST, x: NUM_LIST, kwargs) -> None:
-        self.setData(x, y, kwargs)
+    def slot_new_data(self, y: NUM_LIST, x: NUM_LIST, kwargs: Dict) -> None:
+        self.setData(x, y, **kwargs)
 
     def slot_connector_toggle(self, data_connector, flag: bool):
         if self.plot_widget is not None:
@@ -52,8 +52,8 @@ class MixinLiveBarPlot(SupportsLivePlot):
     plot_widget: Optional[LivePlotWidget] = None
     sigPlotChanged = QtCore.Signal()
 
-    def slot_new_data(self, y: NUM_LIST, x: NUM_LIST, kwargs) -> None:
-        self.setData(x, y, kwargs)
+    def slot_new_data(self, y: Any, x: Any, kwargs: Dict) -> None:
+        self.setData(x, y, **kwargs)
 
     def slot_connector_toggle(self, data_connector, flag: bool):
         if self.plot_widget is not None:

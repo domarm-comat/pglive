@@ -56,8 +56,8 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.x0 = x0
         super().__init__(x0=x0, y=[0], width=0, height=0, **kwargs)
 
-    def setData(self, x: float, y: float, kwargs: Dict) -> None:
-        self.setOpts(x0=self.x0, y=x, height=self.bar_height, width=y, **kwargs)
+    def setData(self, x_data: float, y_data: float, **kwargs: Dict) -> None:
+        self.setOpts(x0=self.x0, y=x_data, height=self.bar_height, width=y_data, **kwargs)
         self.sigPlotChanged.emit()
 
     def getData(self) -> Tuple[List[float], List[float]]:
@@ -87,8 +87,8 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.y0 = y0
         super().__init__(y0=y0, x=[0], width=0, height=0, **kwargs)
 
-    def setData(self, x: float, y: float, kwargs: Dict) -> None:
-        self.setOpts(y0=self.y0, x=x, height=y, width=self.bar_width, **kwargs)
+    def setData(self, x_data: float, y_data: float, **kwargs: Dict) -> None:
+        self.setOpts(y0=self.y0, x=x_data, height=y_data, width=self.bar_width, **kwargs)
         self.sigPlotChanged.emit()
 
     def update_leading_line(self) -> None:

@@ -1,9 +1,9 @@
 import pglive.examples_pyqt5 as examples
-from pyqtgraph import mkPen
+from pyqtgraph import mkPen  # type: ignore
 
 from threading import Thread
 
-import pyqtgraph as pg
+import pyqtgraph as pg  # type: ignore
 
 from pglive.kwargs import LeadingLine
 from pglive.sources.data_connector import DataConnector

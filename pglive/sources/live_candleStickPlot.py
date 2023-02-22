@@ -29,7 +29,7 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
     def boundingRect(self) -> QtCore.QRect:
         return QtCore.QRectF(self.picture.boundingRect())
 
-    def setData(self, x_data: List[float], y_data: List[Tuple[float, ...]], kwargs: Dict) -> None:
+    def setData(self, x_data: List[float], y_data: List[Tuple[float, ...]], **kwargs: Dict) -> None:
         """y_data must be in format [[open, close, min, max], ...]"""
         self.x_data = x_data
         self.y_data = y_data

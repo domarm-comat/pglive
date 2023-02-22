@@ -2,7 +2,7 @@ import pglive.examples_pyqt5 as examples
 import signal
 from threading import Thread
 
-import pyqtgraph as pg
+import pyqtgraph as pg  # type: ignore
 from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
