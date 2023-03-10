@@ -10,7 +10,6 @@ from pyqtgraph import PlotDataItem  # type: ignore
 from pyqtgraph.Qt import QtCore  # type: ignore
 
 from pglive.sources.live_plot import MixinLivePlot, MixinLiveBarPlot, make_live
-from pglive.sources.live_plot_widget import LivePlotWidget
 from pglive.sources.utils import NUM_LIST, NUM
 
 warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
@@ -78,6 +77,7 @@ class DataConnector(QtCore.QObject):
             PlotDataItem.setVisible(self.plot, flag)
             self.sig_data_toggle.emit(self, flag)
 
+        setattr(self.plot, "data_connector", self)
         setattr(self.plot, "setVisible", toggle_plot_visibility)
 
     @property

@@ -161,3 +161,11 @@ class LiveAxisRange:
             self.get_y_range(data_connector, data_connector.rolling_index)
         except TypeError:
             return None
+
+    def remove_data_connector(self, data_connector):
+        if data_connector.__hash__() in self.ignored_data_connectors:
+            del self.ignored_data_connectors[data_connector.__hash__()]
+        if data_connector.__hash__() in self.y_range:
+            del self.y_range[data_connector.__hash__()]
+        if data_connector.__hash__() in self.x_range:
+            del self.x_range[data_connector.__hash__()]

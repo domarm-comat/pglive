@@ -61,10 +61,18 @@ class LivePlotWidget(pg.PlotWidget):
             self.plotItem.addItem(*args)
             args[0].plot_widget = self
 
+        def removeItem(*args):
+            for item in args:
+                if hasattr(item, "data_connector"):
+                    self.x_range_controller.remove_data_connector(item.data_connector)
+                    self.y_range_controller.remove_data_connector(item.data_connector)
+            return self.plotItem.removeItem(*args)
+
         self.disableAutoRange()
         self.getPlotItem().vb.setRange = self.set_range
         self.getPlotItem().vb.sigRangeChangedManually.connect(self.sm)
         self.addItem = addItem
+        self.removeItem = removeItem
 
     def sm(self, *args, **kwargs):
         self.manual_range = True
