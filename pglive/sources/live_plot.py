@@ -2,7 +2,6 @@ from typing import Dict, Any, Tuple, List
 
 import numpy as np  # type: ignore
 import pyqtgraph as pg  # type: ignore
-from numpy import ndarray
 
 from pglive.sources.live_mixins import MixinLivePlot, MixinLeadingLine, MixinLiveBarPlot
 
@@ -39,7 +38,7 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
 
         self.update_leading_text(last_point[0], last_point[1])
 
-    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
+    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = self.getData()
         if ax == 0:
             sub_range = x[-offset:]
@@ -70,7 +69,7 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.opts["y"][-1])
         self.update_leading_text(self.opts["width"][-1], self.opts["y"][-1])
 
-    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
+    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = self.getData()
         if ax == 0:
             sub_range = x[-offset:]
@@ -98,7 +97,7 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.opts["height"][-1])
         self.update_leading_text(self.opts["x"][-1], self.opts["height"][-1])
 
-    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
+    def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = self.getData()
         if ax == 0:
             sub_range = x[-offset:]
@@ -120,7 +119,7 @@ def make_live(plot: pg.GraphicsObject) -> None:
     else:
         plot.slot_new_data = lambda y, x, kwargs: plot.setData(x, y, **kwargs)
 
-    def data_bounds(ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
+    def data_bounds(ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = plot.getData()
         if ax == 0:
             sub_range = x[-offset:]

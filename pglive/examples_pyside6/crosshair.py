@@ -12,7 +12,7 @@ from pglive.sources.live_plot import LiveLinePlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example, we create plot with Crosshair.
+We create plot with Crosshair in this example.
 Crosshair has few signals implemented:
     sig_crosshair_moved - fired when crosshair is moved within plot area
     sig_crosshair_out - fired when crosshair leaves plot area

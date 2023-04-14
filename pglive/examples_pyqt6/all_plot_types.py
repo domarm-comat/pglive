@@ -8,7 +8,7 @@ from pglive.sources.live_plot import LiveVBarPlot, LiveLinePlot, LiveScatterPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example all plot types are displayed.
+All basic plot types are displayed in this example.
 """
 
 layout = pg.LayoutWidget()

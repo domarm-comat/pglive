@@ -11,7 +11,7 @@ from pglive.sources.live_plot import LiveLinePlot, LiveScatterPlot, LiveHBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example leading line is displayed.
+Leading line is displayed in this example.
 Pglive can plot Vertical or Horizontal leading line.
 User can choose orientation and which value is displayed by using text_axis parameter.
 Please note, that X might be swapped with Y, when plotting horizontally or vertically.

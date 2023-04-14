@@ -1,6 +1,6 @@
-import pglive.examples_pyqt5 as examples
 from threading import Thread
 
+import pglive.examples_pyqt5 as examples
 import pyqtgraph as pg  # type: ignore
 
 from pglive.sources.data_connector import DataConnector
@@ -8,8 +8,8 @@ from pglive.sources.live_plot import LiveHBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example, different plot rate is demonstrated.
-Display four plots, each slower by 1/4 of previous plot rate.
+Different plot rate is demonstrated in this example.
+Display four plots, each slower by 1/4 from previous plot rate.
 Plot rate is set in Hz unit.
 """
 layout = pg.LayoutWidget()

@@ -10,7 +10,7 @@ from pglive.sources.live_plot import LiveHBarPlot, LiveVBarPlot, LiveLinePlot, L
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example all plot types are displayed.
+All plot types are displayed in this example.
 """
 
 layout = pg.LayoutWidget()

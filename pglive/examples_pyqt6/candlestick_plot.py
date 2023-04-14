@@ -7,7 +7,7 @@ from pglive.sources.live_candleStickPlot import LiveCandleStickPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example Scatter plot is displayed.
+Candlestick Bar plot is displayed in this example.
 """
 win = LivePlotWidget(title="Candlestick Plot @ 10Hz")
 plot = LiveCandleStickPlot()

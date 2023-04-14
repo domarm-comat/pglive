@@ -8,7 +8,7 @@ from pglive.sources.live_plot import LiveHBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example, different plot rate is demonstrated.
+Different plot rate is demonstrated in this example.
 Display four plots, each slower by 1/4 of previous plot rate.
 Plot rate is set in Hz unit.
 """

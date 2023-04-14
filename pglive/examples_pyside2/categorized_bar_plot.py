@@ -9,7 +9,7 @@ from pglive.sources.live_categorized_bar_plot import LiveCategorizedBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example Categorized Bar plot is displayed.
+Categorized Bar plot is displayed in this example.
 """
 categories = ["On", "Off", "Idle", "Warning", "Failure"]
 plot = LiveCategorizedBarPlot(categories,

@@ -6,7 +6,7 @@ from pglive.sources.live_plot import LiveHBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example Horizontal Bar plot is displayed.
+Horizontal Bar plot is displayed in this example.
 """
 win = LivePlotWidget(title="Horizontal Bar Plot @ 100Hz")
 plot = LiveHBarPlot(bar_height=1, brush="green", pen="green")

@@ -14,7 +14,7 @@ from pglive.sources.live_plot import LiveLinePlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example Line plot is displayed.
+Line plot is displayed in this example.
 """
 connectors = []
 

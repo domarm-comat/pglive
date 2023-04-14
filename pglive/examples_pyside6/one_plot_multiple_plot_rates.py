@@ -10,7 +10,7 @@ from pglive.sources.live_plot import LiveLinePlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example we are plotting two signals in one plot with different plot_rate.
+We are plotting two signals in one plot with different plot_rate in this example.
 Since LiveAxisRange is calculating range from plot_rate, it might result in unwanted results.
 You can use ignore_auto_range flag for DataConnector.
 If it's set to True, this DataConnector is not causing change of range.

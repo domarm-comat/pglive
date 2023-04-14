@@ -9,7 +9,7 @@ from pglive.sources.live_plot import LiveVBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example Vertical Bar plot is displayed.
+Vertical Bar plot is displayed in this example.
 Every update bar color is changed as well.
 """
 win = LivePlotWidget(title="Coloured Vertical Bar Plot @ 100Hz")

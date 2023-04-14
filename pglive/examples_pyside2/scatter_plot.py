@@ -7,7 +7,7 @@ from pglive.sources.live_plot import LiveScatterPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example Scatter plot is displayed.
+Scatter plot is displayed in this example.
 """
 win = LivePlotWidget(title="Scatter Plot @ 100Hz")
 plot = LiveScatterPlot()

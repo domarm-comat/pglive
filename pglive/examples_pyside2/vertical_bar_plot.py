@@ -7,7 +7,7 @@ from pglive.sources.live_plot import LiveVBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example Vertical Bar plot is displayed.
+Vertical Bar plot is displayed in this example.
 """
 win = LivePlotWidget(title="Vertical Bar Plot @ 100Hz")
 plot = LiveVBarPlot(bar_width=1, brush="blue", pen="blue")

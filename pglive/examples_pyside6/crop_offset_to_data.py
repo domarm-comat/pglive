@@ -9,13 +9,13 @@ from pglive.sources.live_plot import LiveLinePlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example live axis range crop offset to data is displayed.
+Range crop offset to data is displayed In this example.
 """
 layout = pg.LayoutWidget()
 layout.layout.setSpacing(0)
 
 '''
-We want to display view 30 seconds long and pan right every 1 second. 
+We want to display 30 seconds long view and pan right every 1 second.
 '''
 widget = LivePlotWidget(title="Roll plot view every 1 sec, offset 30 sec, crop left = False",
                         x_range_controller=LiveAxisRange(roll_on_tick=100, offset_left=30),

@@ -9,7 +9,7 @@ from pglive.sources.live_plot import LiveScatterPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example Pause and Resume functionality of DataConnector is demonstrated.
+Pause and Resume functionality of DataConnector is demonstrated in this example.
 There are two buttons, that pause and resume live plotting.
 When Live plot is paused, data are not collected.
 """

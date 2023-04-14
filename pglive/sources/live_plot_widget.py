@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Union, Optional, Any, List, Dict, TYPE_CHECKING
 
 import pyqtgraph as pg  # type: ignore
@@ -12,6 +13,7 @@ from pglive.sources.live_axis_range import LiveAxisRange
 
 if TYPE_CHECKING:
     from pglive.sources.data_connector import DataConnector
+
 
 class LivePlotWidget(pg.PlotWidget):
     """Implements main plot widget for all live plots"""
@@ -74,7 +76,7 @@ class LivePlotWidget(pg.PlotWidget):
         self.addItem = addItem
         self.removeItem = removeItem
 
-    def sm(self, *args, **kwargs):
+    def sm(self, *args, **kwargs) -> None:
         self.manual_range = True
 
     def _add_crosshair(self, crosshair_pen: QtGui.QPen, crosshair_text_kwargs: dict) -> None:

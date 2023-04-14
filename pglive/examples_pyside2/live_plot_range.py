@@ -11,7 +11,7 @@ from pglive.sources.live_plot import LiveLinePlot
 from pglive.sources.live_plot_widget import LivePlotWidget
 
 """
-In this example live plot range is used to increase plotting performance.
+Live plot range is used to increase plotting performance in this example.
 """
 
 layout = pg.LayoutWidget()
