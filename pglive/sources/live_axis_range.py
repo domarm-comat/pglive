@@ -134,10 +134,23 @@ class LiveAxisRange:
     def _get_range(self, axis_range: Tuple[float, float], tick: int, offsets: Tuple[float, float]) -> Optional[
         List[float]]:
         if self.fixed_range is not None:
+            # Return fixed defined range
             return self.fixed_range
         elif self.roll_on_tick == 1:
-            return [axis_range[0], axis_range[1]]
+            # Rolling on every tick
+            if offsets[0] + offsets[1] == 0:
+                # Return full range if there are no offsets
+                return [axis_range[0], axis_range[1]]
+            elif tick > 0:
+                # Return range of width specified by offsets
+                range_width = (abs(axis_range[1] - axis_range[0])) / tick
+                return [axis_range[1] - range_width * offsets[0], (axis_range[1] + range_width) + (
+                        range_width * offsets[1])]
+            else:
+                # Just return axis ranges subtracted by offsets
+                return [axis_range[0] - offsets[0], axis_range[1] + offsets[1]]
         elif tick % self.roll_on_tick == 0 or tick < 2:
+            # Rolling when tick % self.roll_on_tick == 0
             range_width = abs(axis_range[1] - axis_range[0])
             if tick < 2:
                 range_width = range_width * (self.roll_on_tick - (tick + 1))
