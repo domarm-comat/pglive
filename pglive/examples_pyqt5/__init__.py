@@ -32,6 +32,21 @@ def sin_wave_generator(*data_connectors, flip=False):
         sleep(0.01)
 
 
+def sin_wave_array_generator(*data_connectors, flip=False, points=10):
+    """Sine wave generator"""
+    x = 0
+    while running:
+        for data_connector in data_connectors:
+            if flip:
+                data_connector.cb_append_data_array(list(range(x, x + points)),
+                                                    [sin((x + xi) * 0.025) for xi in range(points)])
+            else:
+                data_connector.cb_append_data_array([sin((x + xi) * 0.025) for xi in range(points)],
+                                                    list(range(x, x + points)))
+        x += points
+        sleep(0.01)
+
+
 def cos_wave_generator(*data_connectors, flip=False):
     """Cosine wave generator"""
     x = 0
@@ -62,6 +77,28 @@ def candle_generator(*data_connectors, flip=False):
         sleep(0.01)
 
 
+def candle_array_generator(*data_connectors, flip=False, points=10):
+    """Candle stick generator"""
+    x = 0
+
+    def candle(xc):
+        a, b = sin(xc * 0.025), sin(xc * 0.020)
+        s = min(a, b) - random.randint(0, 1000) * 1e-3
+        e = max(a, b) + random.randint(0, 1000) * 1e-3
+        return (a, b, s, e)
+
+    while running:
+        for data_connector in data_connectors:
+            if flip:
+                data_connector.cb_append_data_array(list(range(x, x + points)),
+                                                    [candle(x + xi) for xi in range(points)])
+            else:
+                data_connector.cb_append_data_array([candle(x + xi) for xi in range(points)],
+                                                    list(range(x, x + points)))
+        x += 1
+        sleep(0.01)
+
+
 def category_generator(*data_connectors, categories: List, flip: bool = False):
     """Category generator"""
     x = 0
@@ -73,6 +110,20 @@ def category_generator(*data_connectors, categories: List, flip: bool = False):
                 data_connector.cb_append_data_point(x * 0.01, random_categories)
             else:
                 data_connector.cb_append_data_point(random_categories, x * 0.01)
+        sleep(0.01)
+
+
+def category_array_generator(*data_connectors, categories: List, flip: bool = False, points=10):
+    """Category generator"""
+    x = 0
+    while running:
+        for data_connector in data_connectors:
+            random_categories = [random.sample(categories, random.randint(0, len(categories))) for xi in range(points)]
+            if flip:
+                data_connector.cb_append_data_array(list(range(x, x + points)), random_categories)
+            else:
+                data_connector.cb_append_data_array(random_categories, list(range(x, x + points)))
+        x += 1
         sleep(0.01)
 
 
