@@ -167,3 +167,38 @@ class DataConnector(QtCore.QObject):
                 self._update_data(**kwargs)
                 self.sig_data_roll_tick.emit(self, self.rolling_index)
                 self.rolling_index += 1
+
+    def cb_append_data_array(self, y: List[Union[int, float]], x: Optional[NUM_LIST] = None, **kwargs) -> None:
+        """Append new data point"""
+        if self._skip_update():
+            return
+
+        with self.data_lock:
+            if self.max_points == inf:
+                # Concat two lists
+                self.y += y
+                if x is not None:
+                    self.x += x
+                else:
+                    self.x += list(range(self.x[-1], self.x[-1] + len(y), 1))
+            else:
+                # Concat two queues
+                self.y += deque(y)
+                if x is not None:
+                    self.x += deque(x)
+                else:
+                    self.x += deque(range(self.x[-1], self.x[-1] + len(y), 1))
+
+            if self.tick_position_indexes is not None:
+                if len(self.tick_position_indexes) == 0:
+                    self.tick_position_indexes.append(0.0)
+                elif len(self.tick_position_indexes) == self.tick_position_indexes.maxlen:
+                    self.tick_position_indexes.rotate(-1)
+                else:
+                    self.tick_position_indexes.append(self.tick_position_indexes[-1] + 1.0)
+            self.last_update = time.perf_counter()
+
+            if not self._skip_plot():
+                self._update_data(**kwargs)
+                self.sig_data_roll_tick.emit(self, self.rolling_index)
+                self.rolling_index += len(y)
