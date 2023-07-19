@@ -74,8 +74,9 @@ class LiveHeatMap(pg.GraphicsObject, MixinLivePlot):
         p.scale(1, -1)
         p.rotate(1)
         p.drawText(0, 0, "Y0")
-        rect = self.getViewBox().mapViewToScene(QtCore.QPointF(1, 1))
-        print(rect)
+        # A = self.getViewBox().mapToScene(QtCore.QPointF(0, 0))
+        # B = self.getViewBox().mapSceneToView(QtCore.QPointF(300, 300))
+        # print(A, B)
         # print(self.getViewBox().viewRect(), self.scene().width(), self.scene().height())
 
 
