@@ -169,7 +169,7 @@ class DataConnector(QtCore.QObject):
                 self.rolling_index += 1
 
     def cb_append_data_array(self, y: List[Union[int, float]], x: Optional[NUM_LIST] = None, **kwargs) -> None:
-        """Append new data point"""
+        """Append array of data to existing dataset"""
         if self._skip_update():
             return
 
