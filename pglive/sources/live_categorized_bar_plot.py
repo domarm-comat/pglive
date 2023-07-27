@@ -39,6 +39,16 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
     def boundingRect(self) -> QtCore.QRect:
         return QtCore.QRectF(self.picture.boundingRect())
 
+    def clear(self):
+        self.x_data = []
+        self.y_data = []
+        self.output_y_data = []
+        self.picture = QtGui.QPicture()
+        self.prepareGeometryChange()
+        self.informViewBoundsChanged()
+        self.bounds = [None, None]
+        self.sigPlotChanged.emit(self)
+
     def setData(self, x_data: List[float], y_data: List[Tuple[str]], **kwargs: Dict) -> None:
         """y_data must be in format [[category1, category2, ...], ...]"""
         self.x_data = x_data
@@ -103,6 +113,8 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
 
     def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple:
         if ax == 0:
+            if self.x_data == []:
+                return 0, 0
             sub_range = self.x_data[-offset:]
             return np.nanmin(sub_range), np.nanmax(sub_range)
         else:

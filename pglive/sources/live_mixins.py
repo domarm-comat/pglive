@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Optional, Protocol, Dict, Any, TYPE_CHECKING, List, Tuple
+from typing import Union, Optional, Protocol, Dict, Any, TYPE_CHECKING
 
 import pyqtgraph as pg  # type: ignore
 from pyqtgraph.Qt import QtGui, QtCore  # type: ignore
@@ -137,3 +137,10 @@ class MixinLeadingLine(SupportsLivePlot):
             x_pos = width - self._hl_kwargs["text"].boundingRect().width() + 21
             new_pos = vb.mapSceneToView(QtCore.QPointF(x_pos, pixel_pos.y()))
             self._hl_kwargs["text"].setPos(new_pos.x(), new_pos.y())
+
+    def clear_leading_lines(self):
+        if self._vl_kwargs is not None:
+            self._vl_kwargs["line"].setPos(0)
+        if self._hl_kwargs is not None:
+            self._hl_kwargs["line"].setPos(0)
+        self.update_leading_text(0, 0)

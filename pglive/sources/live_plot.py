@@ -17,8 +17,18 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
             self._hl_kwargs["line"].setPos(self.yData[-1])
         self.update_leading_text(self.xData[-1], self.yData[-1])
 
+    def clear(self):
+        try:
+            self.clear_leading_lines()
+        except:
+            pass
+
+        super().clear()
+
     def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple:
         x, y = self.getData()
+        if x is None and y is None:
+            return 0, 0
         if ax == 0:
             sub_range = x[-offset:]
         else:
@@ -28,6 +38,14 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
 
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     """Scatter plot"""
+
+    def clear(self):
+        try:
+            self.clear_leading_lines()
+        except AttributeError:
+            pass
+
+        super().clear()
 
     def update_leading_line(self) -> None:
         last_point = self.data[-1]
@@ -40,6 +58,8 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
 
     def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = self.getData()
+        if x.size == 0 and y.size == 0:
+            return 0, 0
         if ax == 0:
             sub_range = x[-offset:]
         else:
@@ -59,10 +79,18 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.setOpts(x0=self.x0, y=x_data, height=self.bar_height, width=y_data, **kwargs)
         self.sigPlotChanged.emit()
 
+    def clear(self):
+        self.setOpts(x0=self.x0, y=[], height=self.bar_height, width=[])
+        self.sigPlotChanged.emit()
+
     def getData(self) -> Tuple[List[float], List[float]]:
         return self.opts["width"], self.opts["y"]
 
     def update_leading_line(self) -> None:
+        if self.opts["width"] == [] and self.opts["y"] == []:
+            self.clear_leading_lines()
+            return
+
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.opts["width"][-1])
         if self._hl_kwargs is not None:
@@ -71,6 +99,8 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
 
     def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = self.getData()
+        if x == [] and y == []:
+            return 0, 0
         if ax == 0:
             sub_range = x[-offset:]
         else:
@@ -90,7 +120,15 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.setOpts(y0=self.y0, x=x_data, height=y_data, width=self.bar_width, **kwargs)
         self.sigPlotChanged.emit()
 
+    def clear(self):
+        self.setOpts(y0=self.y0, x=[], height=[], width=self.bar_width)
+        self.sigPlotChanged.emit()
+
     def update_leading_line(self) -> None:
+        if self.opts["x"] == [] and self.opts["height"] == []:
+            self.clear_leading_lines()
+            return
+
         if self._vl_kwargs is not None:
             self._vl_kwargs["line"].setPos(self.opts["x"][-1])
         if self._hl_kwargs is not None:
@@ -99,6 +137,8 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
 
     def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = self.getData()
+        if x == [] and y == []:
+            return 0, 0
         if ax == 0:
             sub_range = x[-offset:]
         else:
@@ -121,6 +161,8 @@ def make_live(plot: pg.GraphicsObject) -> None:
 
     def data_bounds(ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = plot.getData()
+        if x is None and y is None:
+            return 0, 0
         if ax == 0:
             sub_range = x[-offset:]
         else:

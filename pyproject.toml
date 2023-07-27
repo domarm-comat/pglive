@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "pglive"
-version = "0.6.6"
+version = "0.6.7"
 description = "Pyqtgraph live plot"
 authors = ["Martin Domaracky <domarm@comat.sk>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/domarm-comat/pglive"
 repository = "https://github.com/domarm-comat/pglive"
-keywords = ["pyqtgraph", "realtime", "live", "plotting", "pyqt5", "pyqt6", "pyside2", "pyside6"]
+keywords = ["pyqtgraph", "realtime", "live", "plotting", "pyqt5", "pyqt6", "pyside6"]
 classifiers = [
 "Programming Language :: Python :: 3",
 "Operating System :: OS Independent",

@@ -1,3 +1,4 @@
+import copy
 import time
 import warnings
 from collections import deque
@@ -21,6 +22,7 @@ class DataConnector(QtCore.QObject):
     sig_data_toggle = QtCore.Signal(object, bool)
     sig_paused = QtCore.Signal()
     sig_resumed = QtCore.Signal()
+    sig_clear = QtCore.Signal()
     paused: bool = False
     # Last update time, using perf_counter for most precise counter
     last_update: float = 0.
@@ -61,6 +63,7 @@ class DataConnector(QtCore.QObject):
         self.sig_new_data.connect(self.plot.slot_new_data)
         self.sig_data_toggle.connect(self.plot.slot_connector_toggle)
         self.sig_data_roll_tick.connect(self.plot.slot_roll_tick)
+        self.sig_clear.connect(self.plot.clear)
         self.x: Union[NUM_LIST, Deque[NUM], List]
         self.y: Union[NUM_LIST, Deque[NUM], List]
         if self.max_points == inf:
@@ -99,6 +102,16 @@ class DataConnector(QtCore.QObject):
         self.paused = False
         self.sig_resumed.emit()
 
+    def clear(self) -> None:
+        """Clear all data"""
+        with self.data_lock:
+            self.x.clear()
+            self.y.clear()
+            self.rolling_index = 0
+            self.tick_position_indexes = None
+            self.sig_clear.emit()
+            self.sig_data_roll_tick.emit(self, 0)
+
     def _skip_update(self) -> bool:
         """Skip data update"""
         return self.paused or (time.perf_counter() - self.last_update) < self.update_timeout or self.data_lock.locked()
@@ -113,7 +126,7 @@ class DataConnector(QtCore.QObject):
         try:
             self.sig_new_data.emit(np.asarray(self.y), np.asarray(self.x), kwargs)
         except ValueError:
-            self.sig_new_data.emit(self.y, np.asarray(self.x), kwargs)
+            self.sig_new_data.emit(copy.copy(self.y), np.asarray(self.x), kwargs)
         self.last_plot = time.perf_counter()
 
     def cb_set_data(self, y: List[Union[int, float]], x: Optional[NUM_LIST] = None, **kwargs) -> None:
