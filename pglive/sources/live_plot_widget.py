@@ -36,16 +36,17 @@ class LivePlotWidget(pg.PlotWidget):
         self.manual_range = False
 
         super().__init__(parent=parent, background=background, plotItem=plotItem, **kwargs)
-        self.crosshair_enabled = kwargs.get(Crosshair.ENABLED, False)
-        self.crosshair_items: List = []
         self.final_x_range: List[float] = [self.viewRect().x(), self.viewRect().width()]
         self.final_y_range: List[float] = [self.viewRect().y(), self.viewRect().height()]
         self.life_ranges: Dict = {}
+
+        self.crosshair_enabled = kwargs.get(Crosshair.ENABLED, False)
+        self.crosshair_items: List = []
         self.crosshair_x_axis = kwargs.get(Crosshair.X_AXIS, "bottom")
         self.crosshair_y_axis = kwargs.get(Crosshair.Y_AXIS, "left")
         if self.crosshair_enabled:
-            self._add_crosshair(kwargs.get(Crosshair.LINE_PEN, None),
-                                kwargs.get(Crosshair.TEXT_KWARGS, {}))
+            self.add_crosshair(kwargs.get(Crosshair.LINE_PEN, None),
+                               kwargs.get(Crosshair.TEXT_KWARGS, {}))
         self.getPlotItem().autoBtn.clicked.disconnect()
         self.getPlotItem().autoBtn.clicked.connect(self.auto_btn_clicked)
 
@@ -78,21 +79,6 @@ class LivePlotWidget(pg.PlotWidget):
 
     def sm(self, *args, **kwargs) -> None:
         self.manual_range = True
-
-    def _add_crosshair(self, crosshair_pen: QtGui.QPen, crosshair_text_kwargs: dict) -> None:
-        """Add crosshair into plot"""
-        self.vLine = pg.InfiniteLine(angle=90, movable=False, pen=crosshair_pen)
-        self.hLine = pg.InfiniteLine(angle=0, movable=False, pen=crosshair_pen)
-        self.x_value_label = pg.TextItem(**crosshair_text_kwargs)
-        self.y_value_label = pg.TextItem(**crosshair_text_kwargs)
-        # All Crosshair items
-        self.crosshair_items = [self.hLine, self.vLine, self.x_value_label, self.y_value_label]
-        for item in self.crosshair_items:
-            # Make sure, that every crosshair item is painted on top of everything
-            item.setZValue(999)
-            self.addItem(item, ignoreBounds=True)
-        # Hide crosshair at the beginning
-        self.hide_crosshair()
 
     def _update_crosshair_position(self) -> None:
         """Update position of crosshair based on mouse position"""
@@ -128,6 +114,30 @@ class LivePlotWidget(pg.PlotWidget):
 
             # Emit crosshair moved signal
             self.sig_crosshair_moved.emit(mouse_point)
+
+    def add_crosshair(self, crosshair_pen: QtGui.QPen, crosshair_text_kwargs: dict) -> None:
+        """Add crosshair into plot"""
+        self.vLine = pg.InfiniteLine(angle=90, movable=False, pen=crosshair_pen)
+        self.hLine = pg.InfiniteLine(angle=0, movable=False, pen=crosshair_pen)
+        self.x_value_label = pg.TextItem(**crosshair_text_kwargs)
+        self.y_value_label = pg.TextItem(**crosshair_text_kwargs)
+        # All Crosshair items
+        self.crosshair_items = [self.hLine, self.vLine, self.x_value_label, self.y_value_label]
+        for item in self.crosshair_items:
+            # Make sure, that every crosshair item is painted on top of everything
+            item.setZValue(999)
+            self.addItem(item, ignoreBounds=True)
+
+        self.crosshair_enabled = True
+        # Hide crosshair at the beginning
+        self.hide_crosshair()
+
+    def remove_crosshair(self):
+        """Remove crosshair from the plot"""
+        for item in self.crosshair_items:
+            self.removeItem(item)
+        self.crosshair_items = []
+        self.crosshair_enabled = False
 
     def x_format(self, value: Union[int, float]) -> str:
         """X tick format"""

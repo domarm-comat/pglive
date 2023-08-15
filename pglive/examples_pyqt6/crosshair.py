@@ -32,6 +32,14 @@ kwargs = {Crosshair.ENABLED: True,
 
 # Create plot widget
 widget = LivePlotWidget(title="Line Plot and Crosshair @ 100Hz", **kwargs)
+"""
+To add crosshair after LivePlotWidget has been created use:
+widget.add_crosshair(crosshair_pen=pg.mkPen(color="red", width=1), crosshair_text_kwargs={"color": "green"})
+
+To remove crosshair use:
+widget.remove_crosshair()
+"""
+
 plot = LiveLinePlot()
 widget.addItem(plot)
 
