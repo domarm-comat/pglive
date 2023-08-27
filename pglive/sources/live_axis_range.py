@@ -23,10 +23,13 @@ class LiveAxisRange:
         self.ignored_data_connectors: List[str] = []
 
     def get_x_range(self, data_connector, tick: int) -> List[float]:
-        axis_range = data_connector.plot.data_bounds(ax=0, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
         x, _ = data_connector.plot.getData()
         if x is None:
             return [0.]
+        if tick < 2:
+            axis_range = [0, data_connector.plot.data_tick(ax=0)]
+        else:
+            axis_range = data_connector.plot.data_bounds(ax=0, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
 
         final_range = self._get_range(axis_range, tick, (self.offset_left, self.offset_right))
         if final_range is None:
@@ -80,10 +83,14 @@ class LiveAxisRange:
         return self.final_x_range
 
     def get_y_range(self, data_connector, tick: int) -> List[float]:
-        axis_range = data_connector.plot.data_bounds(ax=1, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
+
         _, y = data_connector.plot.getData()
         if y is None:
             return [0.]
+        if tick < 2:
+            axis_range = [0, data_connector.plot.data_tick(ax=1)]
+        else:
+            axis_range = data_connector.plot.data_bounds(ax=1, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
 
         final_range = self._get_range(axis_range, tick, (self.offset_bottom, self.offset_top))
         if final_range is None:
