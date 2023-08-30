@@ -120,3 +120,11 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
         else:
             h = self.bar_height / 2
             return 0 - h, len(self.categories) - (1 - h)
+
+    def data_tick(self, ax: int = 0):
+        if ax == 0:
+            if self.x_data == []:
+                return 0, 0
+            return self.x_data[0] if len(self.x_data) == 1 else self.x_data[-1] - self.x_data[0]
+        else:
+            return 1

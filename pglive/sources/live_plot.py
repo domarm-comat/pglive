@@ -35,6 +35,15 @@ class LiveLinePlot(pg.PlotDataItem, MixinLivePlot, MixinLeadingLine):
             sub_range = y[-offset:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
 
+    def data_tick(self, ax: int = 0):
+        x, y = self.getData()
+        if x is None and y is None:
+            return 0, 0
+        if ax == 0:
+            return x[0] if len(x) == 1 else x[1] - x[0]
+        else:
+            return y[0] if len(y) == 1 else y[1] - y[0]
+
 
 class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
     """Scatter plot"""
@@ -65,6 +74,15 @@ class LiveScatterPlot(pg.ScatterPlotItem, MixinLivePlot, MixinLeadingLine):
         else:
             sub_range = y[-offset:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
+
+    def data_tick(self, ax: int = 0):
+        x, y = self.getData()
+        if x.size == 0 and y.size == 0:
+            return 0, 0
+        if ax == 0:
+            return x[0] if len(x) == 1 else x[1] - x[0]
+        else:
+            return y[0] if len(y) == 1 else y[1] - y[0]
 
 
 class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
@@ -107,6 +125,15 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             sub_range = y[-offset:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
 
+    def data_tick(self, ax: int = 0):
+        x, y = self.getData()
+        if x == [] and y == []:
+            return 0, 0
+        if ax == 0:
+            return x[0] if len(x) == 1 else x[1] - x[0]
+        else:
+            return y[0] if len(y) == 1 else y[1] - y[0]
+
 
 class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
     """Vertical Bar Plot"""
@@ -145,6 +172,15 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
             sub_range = y[-offset:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
 
+    def data_tick(self, ax: int = 0):
+        x, y = self.getData()
+        if x == [] and y == []:
+            return 0, 0
+        if ax == 0:
+            return x[0] if len(x) == 1 else x[1] - x[0]
+        else:
+            return y[0] if len(y) == 1 else y[1] - y[0]
+
 
 def make_live(plot: pg.GraphicsObject) -> None:
     """Convert plot into Live plot"""
@@ -169,7 +205,17 @@ def make_live(plot: pg.GraphicsObject) -> None:
             sub_range = y[-offset:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
 
+    def data_tick(self, ax: int = 0):
+        x, y = self.getData()
+        if x is None and y is None:
+            return 0, 0
+        if ax == 0:
+            return x[0] if len(x) == 1 else x[1] - x[0]
+        else:
+            return y[0] if len(y) == 1 else y[1] - y[0]
+
     plot.data_bounds = data_bounds
+    plot.data_tick = data_tick
     plot.slot_connector_toggle = lambda data_connector, flag: plot.plot_widget.slot_connector_toggle(data_connector,
                                                                                                      flag)
     plot.slot_roll_tick = lambda data_connector, tick: plot.plot_widget.slot_roll_tick(data_connector, tick)

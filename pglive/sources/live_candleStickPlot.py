@@ -94,3 +94,12 @@ class LiveCandleStickPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine):
         else:
             sub_range = self.output_y_data[-offset * 2:]
         return np.nanmin(sub_range), np.nanmax(sub_range)
+
+    def data_tick(self, ax: int = 0):
+        if self.x_data == [] and self.output_y_data == []:
+            return 0, 0
+        if ax == 0:
+            return self.x_data[0] if len(self.x_data) == 1 else self.x_data[-1] - self.x_data[0]
+        else:
+            return self.output_y_data[0] if len(self.output_y_data) == 1 else self.output_y_data[-1] - \
+                                                                              self.output_y_data[0]
