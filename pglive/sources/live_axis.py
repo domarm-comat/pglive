@@ -108,6 +108,7 @@ class LiveAxis(pg.AxisItem):
             p.setPen(pen)
             p.drawLine(p1, p2)
         profiler('draw ticks')
+
         # Draw all text
         if self.style['tickFont'] is not None:
             p.setFont(self.style['tickFont'])

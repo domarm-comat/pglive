@@ -32,74 +32,92 @@ class LiveHeatMap(pg.GraphicsObject, MixinLivePlot):
         if heatmap is None:
             self.heatmap = np.array([[], []])
         self.grid_pen = grid_pen
-        if grid_pen is None:
-            self.grid_pen = QtCore.Qt.PenStyle.NoPen
         self.draw_counts = draw_counts
 
     def paint(self, p: QtGui.QPainter, *args: Any) -> None:
         p.drawPicture(0, 0, self.picture)
 
     def boundingRect(self) -> QtCore.QRect:
-        return QtCore.QRectF(0, 0, 5, 5)
+        return QtCore.QRectF(self.picture.boundingRect())
 
     def setData(self, x_data: List[str], y_data: List[str], **kwargs: Dict) -> None:
         """y_data must be in format [[open, close, min, max], ...]"""
         if "heatmap" not in kwargs:
             raise Exception("Heatmap attribute must be set")
-
+        self.x_data = list(range(len(x_data)+1))
+        self.y_data = list(range(len(y_data)+1))
         self.picture = QtGui.QPicture()
         p = QtGui.QPainter(self.picture)
         p.setPen(pg.mkPen("w"))
         heatmap = kwargs["heatmap"]
-
         normalized_heatmap = (heatmap - np.min(heatmap)) / (np.max(heatmap) - np.min(heatmap))
         colors = self.colormap.map([normalized_heatmap])[0]
 
-        x_size = 1 / heatmap.shape[0] if heatmap.shape[0] > 0 else 0
-        y_size = 1 / heatmap.shape[1] if heatmap.shape[1] > 0 else 0
-
         p.save()
-        p.setPen(self.grid_pen)
-
+        img_data = []
         for ix, x in enumerate(x_data):
             for iy, y in enumerate(y_data):
-                p.setBrush(self.get_brush(tuple(colors[ix][iy])))
-                p.drawRect(QtCore.QRectF(ix * x_size, iy * y_size, x_size, y_size))
+                img_data.append(colors[ix][iy])
+
+        cc = np.array(img_data)[:-1]
+        img = QtGui.QImage(cc, len(x_data), len(y_data), QtGui.QImage.Format.Format_RGBA8888)
+        p.drawImage(QtCore.QPoint(0, 0), img)
+
+        if self.grid_pen is not None:
+            p.setPen(self.grid_pen)
+            for ix, x in enumerate(x_data):
+                p.drawLine(ix, 0, ix, len(y_data))
+            p.drawLine(ix+ 1, 0, ix+1, len(y_data))
+            for iy, y in enumerate(y_data):
+                p.drawLine(0, iy, len(x_data), iy)
+            p.drawLine(0, iy + 1, len(x_data), iy + 1)
+
         p.restore()
 
         if self.draw_counts:
-            font = p.font()
-            font.setPointSize(1000)
-            p.setFont(font)
-
             matrix = p.transform()
-            w = 1 / len(x_data)
-            h = 1 / len(y_data)
             str_size = p.fontMetrics().boundingRect(str(np.max(heatmap)))
             mapped_size = matrix.map(QtCore.QPointF(str_size.width(), str_size.height()))
             if str_size.width() > str_size.height():
-                ideal_w = w * 0.9
-                scale = ideal_w / mapped_size.x()
+                scale = 1 / mapped_size.x()
             else:
-                ideal_h = h
-                scale = ideal_h / mapped_size.y()
+                scale = 1 / mapped_size.y()
             p.scale(scale, -scale)
             matrix = p.transform()
             inv_matrix = matrix.inverted()[0]
-
+            # Convert numbers to strings
+            string_heatmap = heatmap.astype(str)
+            bounding = self.boundingRect().toAlignedRect()
             for ix, x in enumerate(x_data):
                 for iy, y in enumerate(y_data):
-                    p.drawText(inv_matrix.mapRect(QtCore.QRectF(ix * x_size, iy * y_size, x_size, y_size)),
-                               QtCore.Qt.AlignmentFlag.AlignCenter, str(heatmap[ix][iy]))
+                    # Draw numbers inside pixels
+                    p.drawText(inv_matrix.mapRect(QtCore.QRectF(ix, iy, 1, 1)),
+                               QtCore.Qt.AlignmentFlag.AlignCenter, string_heatmap[ix][iy])
 
+        p.end()
+        self.prepareGeometryChange()
+        self.informViewBoundsChanged()
+        self.bounds = [None, None]
         self.sigPlotChanged.emit(self)
 
-    def getData(self) -> Tuple[List[float], List[Tuple[float, ...]]]:
+    def getData(self) -> Tuple[List[int], List[int]]:
         return self.x_data, self.y_data
 
     def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[ndarray, ndarray]:
-        return np.nanmin([0, 10]), np.nanmax([0, 10])
+        if self.x_data == [] and self.y_data == []:
+            return 0, 0
+        if ax == 0:
+            sub_range = self.x_data[-offset:]
+        else:
+            sub_range = self.y_data[-offset:]
+        return np.nanmin(sub_range), np.nanmax(sub_range)
 
-    @lru_cache
-    def get_brush(self, color):
-        return pg.mkBrush(color)
+    def clear(self):
+        self.x_data = []
+        self.y_data = []
+        self.output_y_data = []
+        self.picture = QtGui.QPicture()
+        self.prepareGeometryChange()
+        self.informViewBoundsChanged()
+        self.bounds = [None, None]
+        self.sigPlotChanged.emit(self)
