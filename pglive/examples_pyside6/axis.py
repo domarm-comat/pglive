@@ -21,7 +21,7 @@ connectors = []
 layout = pg.LayoutWidget()
 # Define Time plot
 left_axis = LiveAxis("left", axisPen="red", textPen="red")
-bottom_axis = LiveAxis("bottom", axisPen="green", textPen="green", **{Axis.TICK_FORMAT: Axis.TIME})
+bottom_axis = LiveAxis("bottom", axisPen="green", textPen="green", tick_angle=-45, **{Axis.TICK_FORMAT: Axis.TIME})
 time_axis_plot_widget = LivePlotWidget(title="Time Line Plot @ 100Hz",
                                        axisItems={'bottom': bottom_axis, 'left': left_axis})
 plot = LiveLinePlot()

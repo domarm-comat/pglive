@@ -1,25 +1,21 @@
 # Live pyqtgraph plot
 
 Pglive package adds support for thread-safe live plotting to pyqtgraph.  
-It supports PyQt5, PyQt6 and PySide6.
+It supports PyQt5, PyQt6, PySide2 and PySide6.
 
 # Description #
 
-By default, pyqtgraph doesn't support real-time plotting. Aim of this package is to provide easy way to implement various Live plots.
-Every plot is connected with DataConnector, which sole purpose is to consume data points
-and manage data re-plotting / clearing. DataConnector interface provides Pause and Resume method, update rate and maximum number of
-plotted points. Each time data point is collected, call `DataConnector.cb_set_data`, `DataConnector.cb_append_data_array`
-or `DataConnector.cb_append_data_point` callback. Calling `DataConnector.clear` will clear the plot.
-That's all you need to update plot with new data. Callbacks are Thread  safe, so it works nicely in multithreaded applications.
+By default, pyqtgraph doesn't support live plotting. Aim of this package is to provide easy implementation of Line,
+Scatter and Bar Live plot. Every plot is connected with it's DataConnector, which sole purpose is to consume data points
+and manage data re-plotting. DataConnector interface provides Pause and Resume method, update rate and maximum number of
+plotted points. Each time data point is collected, call `DataConnector.cb_set_data`
+or `DataConnector.cb_append_data_point` callback. That's all You need to update plot with new data. Callbacks are Thread
+safe, so it works nicely in applications with multiple data collection Threads.
 
 **Focus on data collection and leave plotting to pglive.**
 
-To make firsts steps easy, package comes with many examples implemented in PyQt5, PyQt6 and PySide6.
-
-# News #
-
-- Added `clear` method to `DataConnector` which can be used to clear plot data.
-- PySide2 support was removed in **v0.6.6** due to the fact, that is no longer supported by devs. Removing PySide2 allowed me to support current Python versions.  
+To make firsts steps easy, package comes with many examples implemented in PyQt5 or PyQt6.
+Support for PySide2 and PySide6 was added in version 0.3.0.
 
 # Code examples #
 
@@ -130,8 +126,9 @@ To make life easier, pglive includes few axis improvements:
 
 - Colored axis line using new `axisPen` attribute
 - Time and DateTime tick format, converting timestamp into human-readable format
+- Use `tick_angle` attribute to change tick angle from 0 default degree
 
-![Crosshair](https://i.postimg.cc/8kr0L2YJ/pglive-axis.gif)
+[![Axis example](https://i.postimg.cc/SQ2hDxBr/Peek-2023-09-03-15-58.gif)](https://postimg.cc/RqBy04V6)
 
 # Summary #
 

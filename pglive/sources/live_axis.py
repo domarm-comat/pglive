@@ -4,7 +4,7 @@ from typing import Any, Optional, List
 
 import pyqtgraph as pg  # type: ignore
 from pyqtgraph import debug as debug, mkPen, getConfigOption  # type: ignore
-from pyqtgraph.Qt import QtGui  # type: ignore
+from pyqtgraph.Qt import QtGui, QtCore  # type: ignore
 
 from pglive.kwargs import Axis
 from pglive.sources.utils import get_scaled_time_duration
@@ -14,7 +14,7 @@ class LiveAxis(pg.AxisItem):
     """Implements live axis"""
 
     def __init__(self, orientation, pen=None, textPen=None, axisPen=None, linkView=None, parent=None, maxTickLength=-5,
-                 showValues=True, text='', units='', unitPrefix='', **kwargs: Any) -> None:
+                 showValues=True, text='', units='', unitPrefix='', tick_angle: float = 0, **kwargs: Any) -> None:
         self.tick_position_indexes: Optional[List] = None
         super().__init__(orientation, pen=pen, textPen=textPen, linkView=linkView, parent=parent,
                          maxTickLength=maxTickLength, showValues=showValues, text=text, units=units,
@@ -30,10 +30,13 @@ class LiveAxis(pg.AxisItem):
         else:
             self.setAxisPen(axisPen)
         # Tick format
+        if tick_angle < 0:
+            tick_angle += 360
+        self.tick_angle = tick_angle % 360
         self.tick_format = kwargs.get(Axis.TICK_FORMAT, None)
         self.categories = kwargs.get(Axis.CATEGORIES, [])
         self.df_short = kwargs.get(Axis.DURATION_FORMAT, Axis.DF_SHORT) == Axis.DF_SHORT
-        if self.tick_format == Axis.CATEGORY:
+        if self.tick_format == Axis.CATEGORY and kwargs.get(Axis.SHOW_ALL_CATEGORIES, True):
             # Override ticks spacing and set spacing 1 with step 1
             self.setTickSpacing(1, 1)
 
@@ -105,14 +108,56 @@ class LiveAxis(pg.AxisItem):
             p.setPen(pen)
             p.drawLine(p1, p2)
         profiler('draw ticks')
-
         # Draw all text
         if self.style['tickFont'] is not None:
             p.setFont(self.style['tickFont'])
         p.setPen(self.textPen())
+        min_height = p.fontMetrics().height()
         bounding = self.boundingRect().toAlignedRect()
         p.setClipRect(bounding)
-        for rect, flags, text in textSpecs:
-            p.drawText(rect, int(flags), text)
+        if self.tick_angle == 0:
+            for rect, flags, text in textSpecs:
+                p.drawText(rect, int(flags), text)
+            self.fixedHeight = min_height + 7
+        else:
+            if self.orientation in ("bottom", "top"):
+                max_height = min_height
+                for rect, flags, text in textSpecs:
+                    p.save()
+                    if self.orientation == "bottom":
+                        if 0 < self.tick_angle <= 180:
+                            rect.moveTopLeft(QtCore.QPointF(rect.center().x(), rect.topLeft().y()))
+                            rot_point = QtCore.QPointF(rect.topLeft().x(), rect.center().y())
+                        else:
+                            rect.moveTopRight(QtCore.QPointF(rect.center().x(), rect.topRight().y()))
+                            rot_point = QtCore.QPointF(rect.topRight().x(), rect.center().y())
+                    else:
+                        if 0 < self.tick_angle <= 180:
+                            rect.moveTopLeft(QtCore.QPointF(rect.center().x(), 0))
+                            rot_point = QtCore.QPointF(rect.topLeft().x(), rect.center().y())
+                        else:
+                            rect.moveBottomLeft(QtCore.QPointF(rect.center().x(), rect.bottomLeft().y()))
+                            rot_point = QtCore.QPointF(rect.bottomLeft().x(), rect.center().y())
 
+                    p.translate(rot_point)
+                    p.rotate(self.tick_angle)
+                    p.translate(-rot_point)
+                    scene_rect = p.transform().mapRect(rect)
+                    if scene_rect.height() > max_height:
+                        max_height = scene_rect.height()
+                    if scene_rect.width() > max_height:
+                        max_height = scene_rect.width()
+                    p.drawText(rect, int(flags), text)
+                    # restoring the painter is *required*!!!
+                    p.restore()
+                self.fixedHeight = max_height + 10
+            else:
+                for rect, flags, text in textSpecs:
+                    p.save()
+                    p.translate(rect.center())
+                    p.rotate(self.tick_angle)
+                    p.translate(-rect.center())
+                    p.drawText(rect, int(flags), text)
+                    # restoring the painter is *required*!!!
+                    p.restore()
         profiler('draw text')

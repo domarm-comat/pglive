@@ -14,11 +14,13 @@ class Axis:
     TIME = "Time"
     CATEGORY = "Category"
     CATEGORIES = "Categories"
+    SHOW_ALL_CATEGORIES = "Show all categories"
     DURATION = "Duration"
     DURATION_FORMAT = "Duration_Format"
     # Duration format options
     DF_SHORT = "short"
     DF_LONG = "long"
+
 
 class LeadingLine:
     HORIZONTAL = "Horizontal"
