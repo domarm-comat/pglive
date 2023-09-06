@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pglive"
-version = "0.7.0"
+version = "0.7.1"
 description = "Pyqtgraph live plot"
 authors = ["Martin Domaracky <domarm@comat.sk>"]
 license = "MIT"

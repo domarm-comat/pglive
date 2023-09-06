@@ -118,10 +118,16 @@ class LiveAxis(pg.AxisItem):
         if self.tick_angle == 0:
             for rect, flags, text in textSpecs:
                 p.drawText(rect, int(flags), text)
+            if self.label.isVisible():
+                min_height += self.label.boundingRect().height() * 0.8
             self.fixedHeight = min_height + 7
         else:
             if self.orientation in ("bottom", "top"):
                 max_height = min_height
+                offset_top = 0
+                if self.label.isVisible():
+                    offset_top = self.label.boundingRect().height() * 0.8
+
                 for rect, flags, text in textSpecs:
                     p.save()
                     if self.orientation == "bottom":
@@ -133,7 +139,7 @@ class LiveAxis(pg.AxisItem):
                             rot_point = QtCore.QPointF(rect.topRight().x(), rect.center().y())
                     else:
                         if 0 < self.tick_angle <= 180:
-                            rect.moveTopLeft(QtCore.QPointF(rect.center().x(), 0))
+                            rect.moveTopLeft(QtCore.QPointF(rect.center().x(), offset_top))
                             rot_point = QtCore.QPointF(rect.topLeft().x(), rect.center().y())
                         else:
                             rect.moveBottomLeft(QtCore.QPointF(rect.center().x(), rect.bottomLeft().y()))
@@ -150,7 +156,8 @@ class LiveAxis(pg.AxisItem):
                     p.drawText(rect, int(flags), text)
                     # restoring the painter is *required*!!!
                     p.restore()
-                self.fixedHeight = max_height + 10
+
+                self.fixedHeight = offset_top + max_height + 10
             else:
                 for rect, flags, text in textSpecs:
                     p.save()

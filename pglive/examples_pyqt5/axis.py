@@ -22,8 +22,12 @@ layout = pg.LayoutWidget()
 # Define Time plot
 left_axis = LiveAxis("left", axisPen="red", textPen="red")
 bottom_axis = LiveAxis("bottom", axisPen="green", textPen="green", tick_angle=-45, **{Axis.TICK_FORMAT: Axis.TIME})
+top_axis = LiveAxis("top", axisPen="orange", textPen="orange", tick_angle=-45, **{Axis.TICK_FORMAT: Axis.TIME})
 time_axis_plot_widget = LivePlotWidget(title="Time Line Plot @ 100Hz",
-                                       axisItems={'bottom': bottom_axis, 'left': left_axis})
+                                       axisItems={'bottom': bottom_axis, 'left': left_axis, 'top': top_axis},
+                                       labels={'bottom': ("Bottom axis"), 'left': ("Left axis"),
+                                               'right': ("Right axis"),
+                                               'top': ("Top axis")})
 plot = LiveLinePlot()
 time_axis_plot_widget.addItem(plot)
 connectors.append(DataConnector(plot, max_points=600))
@@ -33,7 +37,8 @@ layout.addWidget(time_axis_plot_widget)
 left_axis = LiveAxis("left", axisPen="purple", textPen="purple")
 bottom_axis = LiveAxis("bottom", axisPen="yellow", textPen="yellow", **{Axis.TICK_FORMAT: Axis.DATETIME})
 datetime_axis_plot_widget = LivePlotWidget(title="DateTime Line Plot @ 100Hz",
-                                           axisItems={'bottom': bottom_axis, 'left': left_axis})
+                                           axisItems={'bottom': bottom_axis, 'left': left_axis},
+                                           labels={'bottom': ("Bottom axis"), 'left': ("Left axis")})
 plot = LiveLinePlot()
 datetime_axis_plot_widget.addItem(plot)
 
