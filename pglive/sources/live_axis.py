@@ -154,6 +154,8 @@ class LiveAxis(pg.AxisItem):
                     scene_rect = p.transform().mapRect(rect)
                     if scene_rect.height() > max_height:
                         max_height = scene_rect.height()
+                    if scene_rect.width() > max_height:
+                        max_height = scene_rect.width()
                     p.drawText(rect, int(flags), text)
                     # restoring the painter is *required*!!!
                     p.restore()

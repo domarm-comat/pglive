@@ -1,12 +1,12 @@
 import signal
 import time
 from threading import Thread
-
+import pglive.examples_pyside6 as examples
 import numpy.random
 import pyqtgraph as pg
-from PyQt6.QtWidgets import QWidget, QGridLayout
+from PySide6.QtWidgets import QWidget, QGridLayout
 
-import pglive.examples_pyqt6 as examples
+
 from pglive.kwargs import Axis
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_HeatMap import LiveHeatMap

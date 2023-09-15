@@ -1,5 +1,4 @@
-import time
-from functools import lru_cache
+from functools import cache
 from typing import List, Tuple, Any, Dict, Union, Optional
 
 import numpy as np
@@ -17,7 +16,8 @@ class LiveHeatMap(pg.GraphicsObject, MixinLivePlot):
     sigPlotChanged = QtCore.Signal(object)
 
     def __init__(self, colormap: pg.ColorMap, x_data: Optional[List[str]] = None, y_data: Optional[List[str]] = None,
-                 heatmap: Optional[heatmap_data_T] = None, draw_counts: bool = True, grid_pen: Optional[QtGui.QPen] = None) -> None:
+                 heatmap: Optional[heatmap_data_T] = None, grid_pen: Optional[QtGui.QPen] = None,
+                 counts_pen: Optional[QtGui.QPen] = None) -> None:
         """Choose colors of candle"""
         pg.GraphicsObject.__init__(self)
         self.colormap = colormap
@@ -28,11 +28,31 @@ class LiveHeatMap(pg.GraphicsObject, MixinLivePlot):
         self.y_data = y_data
         if self.y_data is None:
             self.y_data = []
+        self.input_x_data = []
+        self.input_y_data = []
         self.heatmap = heatmap
         if heatmap is None:
             self.heatmap = np.array([[], []])
         self.grid_pen = grid_pen
-        self.draw_counts = draw_counts
+        self.counts_pen = counts_pen
+        self.drawing = False
+        self.image_item = pg.ImageItem()
+        self.image_item.setColorMap(self.colormap)
+        self.histogram = pg.HistogramLUTWidget()
+        self.histogram.setImageItem(self.image_item)
+        self.histogram.gradient.setColorMap(self.colormap)
+        self.histogram.gradient.showTicks(False)
+        self.histogram.sigLookupTableChanged.connect(self.slot_gradient_changed)
+        self.histogram.sigLevelChangeFinished.connect(self.slot_levels_changed)
+
+    def slot_gradient_changed(self, *args, **kwargs):
+        if self.colormap != self.histogram.gradient.colorMap():
+            self.colormap = self.histogram.gradient.colorMap()
+            self.setData(self.input_x_data, self.input_y_data, heatmap=self.heatmap)
+
+    def slot_levels_changed(self, *args, **kwargs):
+        if not self.drawing:
+            self.setData(self.input_x_data, self.input_y_data, heatmap=self.heatmap)
 
     def paint(self, p: QtGui.QPainter, *args: Any) -> None:
         p.drawPicture(0, 0, self.picture)
@@ -41,64 +61,89 @@ class LiveHeatMap(pg.GraphicsObject, MixinLivePlot):
         return QtCore.QRectF(self.picture.boundingRect())
 
     def setData(self, x_data: List[str], y_data: List[str], **kwargs: Dict) -> None:
-        """y_data must be in format [[open, close, min, max], ...]"""
         if "heatmap" not in kwargs:
             raise Exception("Heatmap attribute must be set")
-        self.x_data = list(range(len(x_data)+1))
-        self.y_data = list(range(len(y_data)+1))
+
+        self.drawing = True
+        x_data_len, y_data_len = len(x_data), len(y_data)
         self.picture = QtGui.QPicture()
         p = QtGui.QPainter(self.picture)
-        p.setPen(pg.mkPen("w"))
-        heatmap = kwargs["heatmap"]
-        normalized_heatmap = (heatmap - np.min(heatmap)) / (np.max(heatmap) - np.min(heatmap))
+        if self.counts_pen:
+            p.setPen(self.counts_pen)
+        self.heatmap = np.array(kwargs["heatmap"])
+
+        try:
+            map_min, map_max = np.min(self.heatmap), np.max(self.heatmap)
+        except ValueError:
+            return
+
+        if self.x_data:
+            levels = self.histogram.getLevels()
+        else:
+            levels = [map_min, map_max]
+        normalized_heatmap = (self.heatmap - levels[0]) / (levels[1] - levels[0])
         colors = self.colormap.map([normalized_heatmap])[0]
 
-        p.save()
-        img_data = []
-        for ix, x in enumerate(x_data):
-            for iy, y in enumerate(y_data):
-                img_data.append(colors[ix][iy])
+        self.x_data = list(range(x_data_len + 1))
+        self.y_data = list(range(y_data_len + 1))
+        self.input_x_data = x_data
+        self.input_y_data = y_data
 
+        p.save()
+        img_data = [[colors[x][y] for y in range(y_data_len)] for x in range(x_data_len)]
         cc = np.array(img_data)[:-1]
-        img = QtGui.QImage(cc, len(x_data), len(y_data), QtGui.QImage.Format.Format_RGBA8888)
+        img = QtGui.QImage(cc, x_data_len, y_data_len, QtGui.QImage.Format.Format_RGBA8888)
+        p.scale(1, -1)
+        p.translate(0, -y_data_len)
         p.drawImage(QtCore.QPoint(0, 0), img)
 
         if self.grid_pen is not None:
             p.setPen(self.grid_pen)
             for ix, x in enumerate(x_data):
-                p.drawLine(ix, 0, ix, len(y_data))
-            p.drawLine(ix+ 1, 0, ix+1, len(y_data))
+                p.drawLine(ix, 0, ix, y_data_len)
+            p.drawLine(ix + 1, 0, ix + 1, y_data_len)
             for iy, y in enumerate(y_data):
-                p.drawLine(0, iy, len(x_data), iy)
-            p.drawLine(0, iy + 1, len(x_data), iy + 1)
-
+                p.drawLine(0, iy, x_data_len, iy)
+            p.drawLine(0, iy + 1, x_data_len, iy + 1)
         p.restore()
 
-        if self.draw_counts:
+        if self.counts_pen is not None:
             matrix = p.transform()
-            str_size = p.fontMetrics().boundingRect(str(np.max(heatmap)))
-            mapped_size = matrix.map(QtCore.QPointF(str_size.width(), str_size.height()))
+            p.scale(1, -1)
+            p.translate(0, -y_data_len)
+            str_size = p.fontMetrics().boundingRect(str(map_max))
+            mapped_size = matrix.map(QtCore.QPointF(str_size.width() * 1.3, str_size.height()))
             if str_size.width() > str_size.height():
-                scale = 1 / mapped_size.x()
+                side_size = mapped_size.x()
             else:
-                scale = 1 / mapped_size.y()
-            p.scale(scale, -scale)
-            matrix = p.transform()
-            inv_matrix = matrix.inverted()[0]
-            # Convert numbers to strings
-            string_heatmap = heatmap.astype(str)
-            bounding = self.boundingRect().toAlignedRect()
+                side_size = mapped_size.y()
+            scale = 1 / side_size
+            p.scale(scale, scale)
+            # Y string offset
+            y_offset = (side_size - mapped_size.y()) / 2
             for ix, x in enumerate(x_data):
+                px = ix / scale
                 for iy, y in enumerate(y_data):
-                    # Draw numbers inside pixels
-                    p.drawText(inv_matrix.mapRect(QtCore.QRectF(ix, iy, 1, 1)),
-                               QtCore.Qt.AlignmentFlag.AlignCenter, string_heatmap[ix][iy])
-
+                    st, stz = self.get_static_text(self.heatmap[iy][ix])
+                    x_offset = (side_size - stz.width()) / 2
+                    py = iy / scale
+                    p.drawStaticText(px + x_offset, py + y_offset, st)
         p.end()
         self.prepareGeometryChange()
         self.informViewBoundsChanged()
         self.bounds = [None, None]
         self.sigPlotChanged.emit(self)
+
+        # Set histogram
+        self.image_item = pg.ImageItem(self.heatmap)
+        self.histogram.setImageItem(self.image_item)
+        self.histogram.setLevels(*levels)
+        self.drawing = False
+
+    @cache
+    def get_static_text(self, text):
+        st = QtGui.QStaticText(str(text))
+        return st, st.size()
 
     def getData(self) -> Tuple[List[int], List[int]]:
         return self.x_data, self.y_data
