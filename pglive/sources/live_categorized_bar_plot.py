@@ -113,7 +113,7 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
 
     def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple:
         if ax == 0:
-            if self.x_data == []:
+            if self.x_data is []:
                 return 0, 0
             sub_range = self.x_data[-offset:]
             return np.nanmin(sub_range), np.nanmax(sub_range)
@@ -123,7 +123,7 @@ class LiveCategorizedBarPlot(pg.GraphicsObject, MixinLivePlot, MixinLeadingLine)
 
     def data_tick(self, ax: int = 0):
         if ax == 0:
-            if self.x_data == []:
+            if self.x_data is []:
                 return 0, 0
             return self.x_data[0] if len(self.x_data) == 1 else self.x_data[-1] - self.x_data[0]
         else:
