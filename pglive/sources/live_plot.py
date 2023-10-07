@@ -105,7 +105,7 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         return self.opts["width"], self.opts["y"]
 
     def update_leading_line(self) -> None:
-        if self.opts["width"] == [] and self.opts["y"] == []:
+        if self.opts["width"] is [] and self.opts["y"] is []:
             self.clear_leading_lines()
             return
 
@@ -117,7 +117,7 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
 
     def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = self.getData()
-        if x == [] and y == []:
+        if x is [] and y is []:
             return 0, 0
         if ax == 0:
             sub_range = x[-offset:]
@@ -127,7 +127,7 @@ class LiveHBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
 
     def data_tick(self, ax: int = 0):
         x, y = self.getData()
-        if x == [] and y == []:
+        if x is [] and y is []:
             return 0, 0
         if ax == 0:
             return x[0] if len(x) == 1 else x[1] - x[0]
@@ -152,7 +152,7 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
         self.sigPlotChanged.emit()
 
     def update_leading_line(self) -> None:
-        if self.opts["x"] == [] and self.opts["height"] == []:
+        if self.opts["x"] is [] and self.opts["height"] is []:
             self.clear_leading_lines()
             return
 
@@ -164,7 +164,7 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
 
     def data_bounds(self, ax: int = 0, offset: int = 0) -> Tuple[np.ndarray, np.ndarray]:
         x, y = self.getData()
-        if x == [] and y == []:
+        if x is [] and y is []:
             return 0, 0
         if ax == 0:
             sub_range = x[-offset:]
@@ -174,7 +174,7 @@ class LiveVBarPlot(pg.BarGraphItem, MixinLiveBarPlot, MixinLeadingLine):
 
     def data_tick(self, ax: int = 0):
         x, y = self.getData()
-        if x == [] and y == []:
+        if x is [] and y is []:
             return 0, 0
         if ax == 0:
             return x[0] if len(x) == 1 else x[1] - x[0]
