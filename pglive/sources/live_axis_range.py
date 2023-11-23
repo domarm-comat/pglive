@@ -1,11 +1,19 @@
+import numbers
+import time
 from copy import copy
 from typing import Optional, List, Tuple, Dict
 
 
 class LiveAxisRange:
-
-    def __init__(self, roll_on_tick: int = 1, offset_left: float = 0., offset_right: float = 0., offset_top: float = 0.,
-                 offset_bottom: float = 0., fixed_range: Optional[List[float]] = None) -> None:
+    def __init__(
+        self,
+        roll_on_tick: int = 1,
+        offset_left: float = 0.0,
+        offset_right: float = 0.0,
+        offset_top: float = 0.0,
+        offset_bottom: float = 0.0,
+        fixed_range: Optional[List[float]] = None,
+    ) -> None:
         self.roll_on_tick = roll_on_tick
         self.offset_left = offset_left
         self.offset_right = offset_right
@@ -18,19 +26,26 @@ class LiveAxisRange:
         self.fixed_range = fixed_range
         self.x_range: Dict[str, List[float]] = {}
         self.y_range: Dict[str, List[float]] = {}
-        self.final_x_range = [0., 0.]
-        self.final_y_range = [0., 0.]
+        self.final_x_range = [0.0, 0.0]
+        self.final_y_range = [0.0, 0.0]
         self.ignored_data_connectors: List[str] = []
 
     def get_x_range(self, data_connector, tick: int) -> List[float]:
         x, _ = data_connector.plot.getData()
         if x is None:
-            return [0.]
-        if tick < 2:
-            axis_range = [0, data_connector.plot.data_tick(ax=0)]
+            return [0.0]
+        if tick == 0:
+            if isinstance(x[0], numbers.Number):
+                axis_range = [x[0], x[0]]
+            else:
+                axis_range = [0, data_connector.plot.data_tick(ax=0)]
+        elif tick == 1:
+            if isinstance(x[0], numbers.Number):
+                axis_range = [x[0], x[1]]
+            else:
+                axis_range = [0, data_connector.plot.data_tick(ax=0) * 2]
         else:
             axis_range = data_connector.plot.data_bounds(ax=0, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
-
         final_range = self._get_range(axis_range, tick, (self.offset_left, self.offset_right))
         if final_range is None:
             return self.final_x_range
@@ -83,15 +98,21 @@ class LiveAxisRange:
         return self.final_x_range
 
     def get_y_range(self, data_connector, tick: int) -> List[float]:
-
         _, y = data_connector.plot.getData()
         if y is None:
-            return [0.]
-        if tick < 2:
-            axis_range = [0, data_connector.plot.data_tick(ax=1)]
+            return [0.0]
+        if tick == 0:
+            if isinstance(y[0], numbers.Number):
+                axis_range = [y[0], y[0]]
+            else:
+                axis_range = [0, data_connector.plot.data_tick(ax=1)]
+        elif tick == 1:
+            if isinstance(y[0], numbers.Number):
+                axis_range = [y[0], y[1]]
+            else:
+                axis_range = [0, data_connector.plot.data_tick(ax=1) * 2]
         else:
             axis_range = data_connector.plot.data_bounds(ax=1, offset=self.roll_on_tick if self.roll_on_tick > 1 else 0)
-
         final_range = self._get_range(axis_range, tick, (self.offset_bottom, self.offset_top))
         if final_range is None:
             return self.final_y_range
@@ -143,8 +164,9 @@ class LiveAxisRange:
             self.final_y_range = final_range
         return self.final_y_range
 
-    def _get_range(self, axis_range: Tuple[float, float], tick: int, offsets: Tuple[float, float]) -> Optional[
-        List[float]]:
+    def _get_range(
+        self, axis_range: Tuple[float, float], tick: int, offsets: Tuple[float, float]
+    ) -> Optional[List[float]]:
         if self.fixed_range is not None:
             # Return fixed defined range
             return self.fixed_range
@@ -156,8 +178,10 @@ class LiveAxisRange:
             elif tick > 0:
                 # Return range of width specified by offsets
                 range_width = (abs(axis_range[1] - axis_range[0])) / tick
-                return [axis_range[1] - range_width * offsets[0], (axis_range[1] + range_width) + (
-                        range_width * offsets[1])]
+                return [
+                    axis_range[1] - range_width * offsets[0],
+                    (axis_range[1] + range_width) + (range_width * offsets[1]),
+                ]
             else:
                 # Just return axis ranges subtracted by offsets
                 return [axis_range[0] - offsets[0], axis_range[1] + offsets[1]]
@@ -168,8 +192,10 @@ class LiveAxisRange:
                 range_width = range_width * (self.roll_on_tick - (tick + 1))
                 return [axis_range[1], axis_range[1] + range_width]
             else:
-                return [axis_range[1] - range_width * offsets[0], (axis_range[1] + range_width) + (
-                        range_width * offsets[1])]
+                return [
+                    axis_range[1] - range_width * offsets[0],
+                    (axis_range[1] + range_width) + (range_width * offsets[1]),
+                ]
         else:
             return None
 
