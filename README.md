@@ -1,23 +1,22 @@
 # Live pyqtgraph plot
 
-Pglive package adds support for thread-safe live plotting to pyqtgraph.  
-It supports PyQt5, PyQt6, PySide2 and PySide6.
+Pglive package adds support for thread-safe live plotting based on pyqtgraph.  
+It supports PyQt5, PyQt6 and PySide6.
 
 # Description #
 
-By default, pyqtgraph doesn't support live plotting. Aim of this package is to provide easy implementation of Line,
-Scatter and Bar Live plot. Every plot is connected with it's DataConnector, which sole purpose is to consume data points
-and manage data re-plotting. DataConnector interface provides Pause and Resume method, update rate and maximum number of
-plotted points. Each time data point is collected, call `DataConnector.cb_set_data`
-or `DataConnector.cb_append_data_point` callback. That's all You need to update plot with new data. Callbacks are Thread
-safe, so it works nicely in applications with multiple data collection Threads.
+Pyqtgraph doesn't offer easy way to implement live plotting out of the box.
+The aim of PgLive module is to provide easy way of thread-safe live plotting.
+To do this, PgLive provides DataConnector object, which consumes data 
+and manages data plotting. DataConnector interface provides Pause and Resume method, update rate and maximum number of
+plotted points. All that needs to be done is to connect plots and data sources with DataConnector.
+Once data is collected, DataConnector is sending signals to the GUI main loop.
 
-**Focus on data collection and leave plotting to pglive.**
+**Focus on data handling - leave plotting to pglive.**
 
-To make firsts steps easy, package comes with many examples implemented in PyQt5 or PyQt6.
-Support for PySide2 and PySide6 was added in version 0.3.0.
+You can find many examples for PyQt5, PyQt6 or PySide6.
 
-# Code examples #
+# Code example #
 
 ```python
 import sys
@@ -52,11 +51,11 @@ def sin_wave_generator(connector):
         data_point = sin(x * 0.01)
         # Callback to plot new data point
         connector.cb_append_data_point(data_point, x)
-
         sleep(0.01)
 
 
 plot_widget.show()
+# Start sin_wave_generator in new Thread and send data to data_connector
 Thread(target=sin_wave_generator, args=(data_connector,)).start()
 app.exec()
 running = False
@@ -92,16 +91,16 @@ Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlo
 Scaling plot view to plotted data has a huge impact on plotting performance.
 Re-plotting might be laggy when using high update frequencies and multiple plots.    
 To increase plotting performance, pglive introduces `LiveAxisRange`, that can be used in `LivePlotWidget`.
-User can now specify when and how is new view of plotted data calculated.
+User can specify when and how is a new view of plotted data calculated.
 
-Have a look in the `live_plot_range.py` example, to see how it can be used.
+Have a look in the [live_plot_range.py](https://github.com/domarm-comat/pglive/blob/main/pglive/examples_pyqt6/live_plot_range.py) example.
 
 ![Range_optimization](https://i.postimg.cc/3wrMbbTY/a.gif)
 
-In case you want to plot wider area with LiveAxisRange you can use crop_offset_to_data flag.
+In case you want to plot wider area with LiveAxisRange you can use `crop_offset_to_data` flag.
 For example, you want to store 60 seconds, display 30 seconds in a view and move view every 1 second.
-You will have big empty space to the left without setting flag to True.
-Have a look into crop_offset_to_data example.
+You will end up with big empty space to the left if `crop_offset_to_data = False`.
+Take a look into [crop_offset_to_data.py](https://github.com/domarm-comat/pglive/blob/main/pglive/examples_pyqt6/crop_offset_to_data.py) example.
 
 ![crop_offset_to_data](https://i.postimg.cc/90X40Ng7/Peek-2022-09-24-15-20.gif)
 
@@ -109,30 +108,37 @@ Introduced in *v0.4.0*
 
 # Crosshair #
 
-Pglive comes with built-in Crosshair as well.
+Pglive comes with built-in Crosshair as well. Take a look at [crosshair.py](https://github.com/domarm-comat/pglive/blob/main/pglive/examples_pyqt6/crosshair.py) example.
 
 ![Crosshair](https://i.postimg.cc/1z75GZLV/pglive-crosshair.gif)
 
 # Leading lines #
 
 Leading line displays horizontal or vertical line (or both) at the last plotted point.  
-You can choose it's color and which axis value is displayed along with it.  
+You can choose its color and which axis value is displayed along with it.  
+Example at [leading_line.py](https://github.com/domarm-comat/pglive/blob/main/pglive/examples_pyqt6/leading_line.py)
 
 ![Leading lines](https://i.postimg.cc/bYKQGBNp/leading-line.gif)
 
 # Axis #
 
-To make life easier, pglive includes few axis improvements:
+To make life easier, pglive includes a few axis improvements:
 
 - Colored axis line using new `axisPen` attribute
 - Time and DateTime tick format, converting timestamp into human-readable format
-- Use `tick_angle` attribute to change tick angle from 0 default degree
+- Use `tick_angle` attribute to change tick angle from 0 default degree  
+
+Example at [axis.py](https://github.com/domarm-comat/pglive/blob/main/pglive/examples_pyqt6/axis.py)
 
 [![Axis example](https://i.postimg.cc/SQ2hDxBr/Peek-2023-09-03-15-58.gif)](https://postimg.cc/RqBy04V6)
 
 # Summary #
 
-- With Pglive You've got easy Thread-safe implementation of fast Live plots
-- You can use all `kwargs` specified in pyqtgraph
-- Use your pyqtgraph plots with `DataConnector` directly, no need to use specific `LivePlot` class 
+- With Pglive You've got an easy Thread-safe live plot implementation in Pyqt5, Pyqt6 or PySide6
+- It works from Python3.9 and in Python3.12 as well
+- You can use all `kwargs` that works in [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/getting_started/index.html#getting-started-ref)
+- Use your pyqtgraph plots with `DataConnector` directly
 - **Focus on Data Handling, not Data Plotting**
+
+If you find PgLive helpful, please consider [supporting me](https://ko-fi.com/domarmcomatsk), it helps a lot!  
+Thanks to all contributors, feel free to suggest missing feature or any bug on [GitHub](https://github.com/domarm-comat/pglive/issues).
