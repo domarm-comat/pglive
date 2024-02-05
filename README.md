@@ -135,10 +135,11 @@ Example at [axis.py](https://github.com/domarm-comat/pglive/blob/main/pglive/exa
 # Summary #
 
 - With Pglive You've got an easy Thread-safe live plot implementation in Pyqt5, Pyqt6 or PySide6
-- It works from Python3.9 and in Python3.12 as well
 - You can use all `kwargs` that works in [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/getting_started/index.html#getting-started-ref)
-- Use your pyqtgraph plots with `DataConnector` directly
-- **Focus on Data Handling, not Data Plotting**
+- Use your plots with `DataConnector` directly
+- It works with Python3.9, 3.10, 3.11 and 3.12 as well
+- Multiple optimized plot types
+- Many examples for easy start
 
 If you find PgLive helpful, please consider [supporting me](https://ko-fi.com/domarmcomatsk), it helps a lot!  
 Thanks to all contributors, feel free to suggest missing feature or any bug on [GitHub](https://github.com/domarm-comat/pglive/issues).
