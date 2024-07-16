@@ -42,3 +42,13 @@ def get_scaled_time_duration(seconds: float, short: bool = True) -> str:
         duration = "{} {} {} {} {} {}".format(d.year - 1, year, d.month, month, d.day, day)
 
     return duration
+
+
+def dt_conversion(value: int, dt_format: str) -> str:
+    try:
+        return datetime.datetime.fromtimestamp(value).strftime(dt_format)
+    except (ValueError, OSError, OverflowError):
+        if value > 0:
+            return "+inf"
+        else:
+            return "-inf"

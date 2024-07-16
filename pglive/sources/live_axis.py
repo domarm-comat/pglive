@@ -7,7 +7,7 @@ from pyqtgraph import debug as debug, mkPen, getConfigOption  # type: ignore
 from pyqtgraph.Qt import QtGui, QtCore  # type: ignore
 
 from pglive.kwargs import Axis
-from pglive.sources.utils import get_scaled_time_duration
+from pglive.sources.utils import get_scaled_time_duration, dt_conversion
 
 
 class LiveAxis(pg.AxisItem):
@@ -67,10 +67,10 @@ class LiveAxis(pg.AxisItem):
                 pass
         if self.tick_format == Axis.DATETIME:
             # Convert tick to Datetime
-            tick_strings = [datetime.datetime.fromtimestamp(value).strftime("%Y-%m-%d %H:%M:%S") for value in values]
+            tick_strings = [dt_conversion(value, dt_format="%Y-%m-%d %H:%M:%S") for value in values]
         elif self.tick_format == Axis.TIME:
             # Convert tick to Time
-            tick_strings = [datetime.datetime.fromtimestamp(value).strftime("%H:%M:%S") for value in values]
+            tick_strings = [dt_conversion(value, dt_format="%H:%M:%S") for value in values]
         elif self.tick_format == Axis.DURATION:
             # Convert tick to Time duration
             tick_strings = [get_scaled_time_duration(value, short=self.df_short) for value in values]
