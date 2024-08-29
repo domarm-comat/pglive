@@ -5,7 +5,7 @@ from typing import Union, Optional, Protocol, Dict, Any, TYPE_CHECKING
 import pyqtgraph as pg  # type: ignore
 from pyqtgraph.Qt import QtGui, QtCore  # type: ignore
 
-from pglive.kwargs import LeadingLine
+from pglive.kwargs import LeadingLine, Orientation
 from pglive.sources.live_plot_widget import LivePlotWidget
 from pglive.sources.utils import NUM_LIST
 
@@ -74,7 +74,8 @@ class MixinLeadingLine(SupportsLivePlot):
     _vl_kwargs = None
 
     def set_leading_line(self, orientation: str = LeadingLine.VERTICAL,
-                         pen: QtGui.QPen = None, text_axis: str = LeadingLine.AXIS_X, **kwargs) -> Dict:
+                         pen: QtGui.QPen = None, text_axis: str = LeadingLine.AXIS_X,
+                         text_color: str = "black", text_orientation: Orientation = Orientation.AUTO, **kwargs) -> Dict:
         text_axis = text_axis.lower()
         assert text_axis in (LeadingLine.AXIS_X, LeadingLine.AXIS_Y)
 
@@ -84,19 +85,21 @@ class MixinLeadingLine(SupportsLivePlot):
             pen = self.opts.get("pen")
         if orientation == LeadingLine.VERTICAL:
             _v_leading_line = pg.InfiniteLine(angle=90, movable=False, pen=pen)
-            _v_leading_text = pg.TextItem(color="black", angle=-90, fill=pen.color())
+            text_angle = -90 if text_orientation in [Orientation.AUTO, Orientation.VERTICAL] else 0
+            _v_leading_text = pg.TextItem(color=text_color, angle=text_angle, fill=pen.color())
             _v_leading_line.setZValue(999)
             _v_leading_text.setZValue(999)
             self._vl_kwargs = {"line": _v_leading_line, "text": _v_leading_text, "pen": pen, "text_axis": text_axis,
-                               **kwargs}
+                               "text_color": text_color, "text_orientation": text_orientation, **kwargs}
             return self._vl_kwargs
         elif orientation == LeadingLine.HORIZONTAL:
             _h_leading_line = pg.InfiniteLine(angle=0, movable=False, pen=pen)
-            _h_leading_text = pg.TextItem(color="black", fill=pen.color())
+            text_angle = 0 if text_orientation in [Orientation.AUTO, Orientation.HORIZONTAL] else -90
+            _h_leading_text = pg.TextItem(color=text_color, angle=text_angle, fill=pen.color())
             _h_leading_text.setZValue(999)
             _h_leading_text.setZValue(999)
             self._hl_kwargs = {"line": _h_leading_line, "text": _h_leading_text, "pen": pen, "text_axis": text_axis,
-                               **kwargs}
+                               "text_color": text_color, "text_orientation": text_orientation, **kwargs}
             return self._hl_kwargs
         else:
             raise TypeError("Unsupported LeadingLine type")
@@ -127,14 +130,21 @@ class MixinLeadingLine(SupportsLivePlot):
             self._vl_kwargs["text"].setText(text_axis)
             pixel_pos = vb.mapViewToScene(QtCore.QPointF(x, y))
             y_pos = 0 + self._vl_kwargs["text"].boundingRect().height() + 10
-            new_pos = vb.mapSceneToView(QtCore.QPointF(pixel_pos.x(), y_pos))
+            if self._vl_kwargs["text_orientation"] in [Orientation.AUTO, Orientation.VERTICAL]:
+                new_pos = vb.mapSceneToView(QtCore.QPointF(pixel_pos.x(), y_pos))
+            else:
+                x_pos = pixel_pos.x() - self._vl_kwargs["text"].boundingRect().width()
+                new_pos = vb.mapSceneToView(QtCore.QPointF(x_pos, y_pos))
             self._vl_kwargs["text"].setPos(new_pos.x(), new_pos.y())
 
         if self._hl_kwargs is not None:
             text_axis = x_text if self._hl_kwargs["text_axis"] == LeadingLine.AXIS_X else y_text
             self._hl_kwargs["text"].setText(text_axis)
             pixel_pos = vb.mapViewToScene(QtCore.QPointF(x, y))
-            x_pos = width - self._hl_kwargs["text"].boundingRect().width() + 21
+            if self._hl_kwargs["text_orientation"] in [Orientation.AUTO, Orientation.HORIZONTAL]:
+                x_pos = width - self._hl_kwargs["text"].boundingRect().width() + 21
+            else:
+                x_pos = width + self._hl_kwargs["text"].boundingRect().height()
             new_pos = vb.mapSceneToView(QtCore.QPointF(x_pos, pixel_pos.y()))
             self._hl_kwargs["text"].setPos(new_pos.x(), new_pos.y())
 

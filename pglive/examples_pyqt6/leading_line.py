@@ -5,7 +5,7 @@ from threading import Thread
 
 import pyqtgraph as pg  # type: ignore
 
-from pglive.kwargs import LeadingLine
+from pglive.kwargs import LeadingLine, Orientation
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_plot import LiveLinePlot, LiveScatterPlot, LiveHBarPlot, LiveVBarPlot
 from pglive.sources.live_plot_widget import LivePlotWidget
@@ -22,7 +22,8 @@ layout = pg.LayoutWidget()
 # Line plot displaying Vertical Leading line and using Y axis value
 plot_widget_1 = LivePlotWidget(title="Line Plot @ 50Hz, Leading with Y")
 plot = LiveLinePlot()
-plot.set_leading_line(LeadingLine.VERTICAL, pen=mkPen("red"), text_axis=LeadingLine.AXIS_Y)
+plot.set_leading_line(LeadingLine.VERTICAL, pen=mkPen("red"), text_axis=LeadingLine.AXIS_Y, text_color="white",
+                      text_orientation=Orientation.HORIZONTAL)
 plot_widget_1.addItem(plot)
 data_connector = DataConnector(plot, max_points=300, update_rate=50)
 layout.addWidget(plot_widget_1)
@@ -38,7 +39,8 @@ layout.addWidget(plot_widget_2)
 
 plot_widget_3 = LivePlotWidget(title="Line Plot @ 50Hz, Leading with X")
 plot = LiveHBarPlot()
-plot.set_leading_line(LeadingLine.HORIZONTAL, pen=mkPen("yellow"), text_axis=LeadingLine.AXIS_Y)
+plot.set_leading_line(LeadingLine.HORIZONTAL, pen=mkPen("yellow"), text_axis=LeadingLine.AXIS_Y, text_color="blue",
+                      text_orientation=Orientation.VERTICAL)
 plot_widget_3.addItem(plot)
 data_connector3 = DataConnector(plot, max_points=300, update_rate=50)
 layout.addWidget(plot_widget_3)

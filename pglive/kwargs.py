@@ -25,6 +25,10 @@ class Axis:
 class LeadingLine:
     HORIZONTAL = "Horizontal"
     VERTICAL = "Vertical"
-    TEXT_COLOR = "TextColor"
     AXIS_X = "x"
     AXIS_Y = "y"
+
+class Orientation:
+    AUTO = "Auto"
+    HORIZONTAL = "Horizontal"
+    VERTICAL = "Vertical"
