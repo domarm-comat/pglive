@@ -112,15 +112,17 @@ class LiveAxis(pg.AxisItem):
         if self.style['tickFont'] is not None:
             p.setFont(self.style['tickFont'])
         p.setPen(self.textPen())
-        min_height = p.fontMetrics().height()
+        min_height = self.textHeight + 1
         bounding = self.boundingRect().toAlignedRect()
         p.setClipRect(bounding)
         if self.tick_angle == 0:
             for rect, flags, text in textSpecs:
+                if min_height <= rect.height():
+                    min_height = rect.height()
                 p.drawText(rect, int(flags), text)
             if self.label.isVisible():
-                min_height += self.label.boundingRect().height() * 0.8
-            self.fixedHeight = min_height + 7
+                min_height += self.label.boundingRect().height()
+            self.fixedHeight = min_height
         else:
             if self.orientation in ("bottom", "top"):
                 max_height = min_height
@@ -151,13 +153,10 @@ class LiveAxis(pg.AxisItem):
                     scene_rect = p.transform().mapRect(rect)
                     if scene_rect.height() > max_height:
                         max_height = scene_rect.height()
-                    if scene_rect.width() > max_height:
-                        max_height = scene_rect.width()
                     p.drawText(rect, int(flags), text)
                     # restoring the painter is *required*!!!
                     p.restore()
-
-                self.fixedHeight = offset_top + max_height + 10
+                self.fixedHeight = offset_top + max_height + 5
             else:
                 for rect, flags, text in textSpecs:
                     p.save()
