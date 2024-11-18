@@ -85,6 +85,7 @@ Pglive supports four plot types: `LiveLinePlot`, `LiveScatterPlot`, `LiveHBarPlo
 ![All plot types](https://i.postimg.cc/637CsKRC/pglive-allplots.gif)
 ![CandleStick plot](https://i.postimg.cc/0QcmMMb0/plot-candlestick.gif)
 ![live-categorized-bar.gif](https://i.postimg.cc/xqrwXXjY/live-categorized-bar.gif)
+![heatmap.gif](https://i.postimg.cc/B6JR6qGF/heatmap.gif)
 
 # Plot speed optimizations  #
 

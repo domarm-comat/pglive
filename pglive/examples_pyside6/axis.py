@@ -3,10 +3,8 @@ import time
 from math import sin
 from threading import Thread
 from time import sleep
-
-import pyqtgraph as pg  # type: ignore
-
 import pglive.examples_pyside6 as examples
+import pyqtgraph as pg  # type: ignore
 from pglive.kwargs import Axis
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_axis import LiveAxis
