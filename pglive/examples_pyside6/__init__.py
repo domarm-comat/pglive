@@ -18,6 +18,18 @@ def stop():
     running = False
     app.exit(0)
 
+def sin_wave_add_square_wave_generator(*data_connectors, flip=False):
+    """Sine wave + Square Wave generator"""
+    x = 0
+    while running:
+        x += 1
+        square_wave_amplitude = 0 if x // 750 % 2 == 0 else 5
+        for data_connector in data_connectors:
+            if flip:
+                data_connector.cb_append_data_point(x, sin(x * 0.025) + square_wave_amplitude)
+            else:
+                data_connector.cb_append_data_point(sin(x * 0.025) + square_wave_amplitude, x)
+        sleep(0.01)
 
 def sin_wave_generator(*data_connectors, flip=False):
     """Sine wave generator"""
