@@ -18,6 +18,7 @@ layout = pg.LayoutWidget()
 layout.layout.setSpacing(0)
 args = []
 args2 = []
+args3 = []
 
 '''
 Move view to the right on every 300 ticks (data update).
@@ -146,9 +147,45 @@ args.append(DataConnector(plot, max_points=600))
 layout.addWidget(time_axis_plot_widget, row=2, col=2)
 
 # ---
+'''
+Move view to the right on every 300 ticks (data update).
+Y range is automatically adjudicating every tick according to y_min_range_width set.
+'''
+widget = LivePlotWidget(title=f"Rolling X view range, auto Y range @ 100Hz @ Min Range Width 3.0",
+                        y_range_controller=LiveAxisRange(y_min_range_width=3.0))
+plot = LiveLinePlot(pen="green")
+widget.addItem(plot)
+layout.addWidget(widget, row=3, col=0)
+args3.append(DataConnector(plot, max_points=300, update_rate=100))
+
+# ---
+'''
+Move view to the right on every 300 ticks (data update).
+Y range is automatically adjudicating every tick according to y_range_limit set.
+'''
+widget = LivePlotWidget(title=f"Rolling X view range, auto Y range @ 100Hz @ Range Limit -1.0, 1.0",
+                        y_range_controller=LiveAxisRange(y_range_limit=[-1.0, 1.0]))
+plot = LiveLinePlot(pen="green")
+widget.addItem(plot)
+layout.addWidget(widget, row=3, col=1)
+args3.append(DataConnector(plot, max_points=300, update_rate=100))
+
+# ---
+'''
+Move view to the right on every 300 ticks (data update).
+Y range is automatically adjudicating every tick according to y_min_range_width and y_range_limit set.
+
+'''
+widget = LivePlotWidget(title=f"Rolling X view range, auto Y range @ 100Hz @ Min Range Width 3.0 @ Range Limit -1.0, 3.0",
+                        y_range_controller=LiveAxisRange(y_min_range_width=3.0, y_range_limit=[-1.0, 3.0]))
+plot = LiveLinePlot(pen="green")
+widget.addItem(plot)
+layout.addWidget(widget, row=3, col=2)
+args3.append(DataConnector(plot, max_points=300, update_rate=100))
 
 layout.show()
 Thread(target=examples.sin_wave_generator, args=args).start()
 Thread(target=examples.sin_wave_generator, args=args2, kwargs={"flip": True}).start()
+Thread(target=examples.sin_wave_add_square_wave_generator, args=args3).start()
 examples.app.exec()
 examples.stop()

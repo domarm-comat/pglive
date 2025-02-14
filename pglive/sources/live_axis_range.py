@@ -13,6 +13,10 @@ class LiveAxisRange:
         offset_top: float = 0.0,
         offset_bottom: float = 0.0,
         fixed_range: Optional[List[float]] = None,
+        x_min_range_width: Optional[float] = None,
+        x_range_limit: Optional[List[float]] = None,
+        y_min_range_width: Optional[float] = None,
+        y_range_limit: Optional[List[float]] = None,
     ) -> None:
         self.roll_on_tick = roll_on_tick
         self.offset_left = offset_left
@@ -24,6 +28,10 @@ class LiveAxisRange:
         self.crop_top_offset_to_data = False
         self.crop_bottom_offset_to_data = False
         self.fixed_range = fixed_range
+        self.x_min_range_width = x_min_range_width
+        self.x_range_limit = x_range_limit
+        self.y_min_range_width = y_min_range_width
+        self.y_range_limit = y_range_limit
         self.x_range: Dict[str, List[float]] = {}
         self.y_range: Dict[str, List[float]] = {}
         self.final_x_range = [0.0, 0.0]
@@ -65,11 +73,12 @@ class LiveAxisRange:
                 final_range[0] = x_range[0]
             if final_range[1] < x_range[1]:
                 final_range[1] = x_range[1]
-        if final_range[0] == final_range[1]:
+        if final_range[0] == final_range[1] and self.x_min_range_width is not None:
             # Pyqtgraph ViewBox.setRange doesn't like same value for min and max,
             # therefore in that case we must set some range
             final_range[0] -= 0.4
             final_range[1] += 0.4
+        final_range = self._update_range_width(self.x_range_limit, self.x_min_range_width, final_range)
         if self.final_x_range != final_range:
             self.final_x_range = final_range
         return self.final_x_range
@@ -88,11 +97,12 @@ class LiveAxisRange:
                 final_range[1] = x_range[1]
         if final_range is None:
             final_range = [0, 0]
-        if final_range[0] == final_range[1]:
+        if final_range[0] == final_range[1] and self.x_min_range_width is not None:
             # Pyqtgraph ViewBox.setRange doesn't like same value for min and max,
             # therefore in that case we must set some range
             final_range[0] -= 0.4
             final_range[1] += 0.4
+        final_range = self._update_range_width(self.x_range_limit, self.x_min_range_width, final_range)
         if self.final_x_range != final_range:
             self.final_x_range = final_range
         return self.final_x_range
@@ -132,11 +142,12 @@ class LiveAxisRange:
                 final_range[0] = y_range[0]
             if final_range[1] < y_range[1]:
                 final_range[1] = y_range[1]
-        if final_range[0] == final_range[1]:
+        if final_range[0] == final_range[1] and self.y_min_range_width is None:
             # Pyqtgraph ViewBox.setRange doesn't like same value for min and max,
             # therefore in that case we must set some range
             final_range[0] -= 0.4
             final_range[1] += 0.4
+        final_range = self._update_range_width(self.y_range_limit, self.y_min_range_width, final_range)
         if self.final_y_range != final_range:
             self.final_y_range = final_range
         return self.final_y_range
@@ -155,11 +166,12 @@ class LiveAxisRange:
                 final_range[1] = y_range[1]
         if final_range is None:
             final_range = [0, 0]
-        if final_range[0] == final_range[1]:
+        if final_range[0] == final_range[1] and self.y_min_range_width is None:
             # Pyqtgraph ViewBox.setRange doesn't like same value for min and max,
             # therefore in that case we must set some range
             final_range[0] -= 0.4
             final_range[1] += 0.4
+        final_range = self._update_range_width(self.y_range_limit, self.y_min_range_width, final_range)
         if self.final_y_range != final_range:
             self.final_y_range = final_range
         return self.final_y_range
@@ -198,6 +210,25 @@ class LiveAxisRange:
                 ]
         else:
             return None
+
+    def _update_range_width(self, bound, range_width, final_range):
+        if range_width is not None:
+            if abs(final_range[0] - final_range[1]) < range_width:
+                center_pt = (final_range[0] + final_range[1]) / 2
+                final_range[0] = center_pt - range_width / 2
+                final_range[1] = center_pt + range_width / 2
+
+        if bound is not None:
+            final_range_width = abs(final_range[0] - final_range[1])
+            if (bound[0] > final_range[1] and bound[0] > final_range[0]) or \
+                (bound[1] < final_range[1] and bound[0] < final_range[0]) or \
+                (bound[0] > final_range[0] and bound[1] < final_range[1]):
+                final_range = bound
+            elif bound[1] > final_range[0] and final_range[0] > bound[0]:
+                final_range = [max(bound[1] - final_range_width, bound[0]), bound[1]]
+            elif bound[0] < final_range[1] and final_range[1] < bound[1]:
+                final_range = [bound[0], min(bound[0] + final_range_width, bound[1])]
+        return final_range
 
     def ignore_connector(self, data_connector, flag: bool) -> None:
         if not flag:
