@@ -13,7 +13,12 @@ from pyqtgraph.Qt import QtCore  # type: ignore
 from pglive.sources.live_plot import MixinLivePlot, MixinLiveBarPlot, make_live
 from pglive.sources.utils import NUM_LIST, NUM
 
-warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
+# numpy >= 1.25 compatibility
+try:
+    from numpy.exceptions import VisibleDeprecationWarning
+except ImportError:
+    from numpy import VisibleDeprecationWarning
+warnings.filterwarnings("ignore", category=VisibleDeprecationWarning)
 
 
 class DataConnector(QtCore.QObject):
