@@ -219,15 +219,16 @@ class LiveAxisRange:
                 final_range[1] = center_pt + range_width / 2
 
         if bound is not None:
-            final_range_width = abs(final_range[0] - final_range[1])
-            if (bound[0] > final_range[1] and bound[0] > final_range[0]) or \
-                (bound[1] < final_range[1] and bound[0] < final_range[0]) or \
-                (bound[0] > final_range[0] and bound[1] < final_range[1]):
-                final_range = bound
-            elif bound[1] > final_range[0] and final_range[0] > bound[0]:
-                final_range = [max(bound[1] - final_range_width, bound[0]), bound[1]]
-            elif bound[0] < final_range[1] and final_range[1] < bound[1]:
-                final_range = [bound[0], min(bound[0] + final_range_width, bound[1])]
+            if range_width is not None:
+                if final_range[1] > bound[1]:
+                    final_range = [max(min(bound[1] - range_width, final_range[0]), bound[0]), bound[1]]
+                elif bound[0] > final_range[0]:
+                    final_range = [bound[0], min(max(bound[0] + range_width, final_range[1]), bound[1])]
+            else:
+                if final_range[1] > bound[1] or bound[0] > final_range[1]:
+                    final_range = [max(final_range[0], bound[0]), bound[1]]
+                if bound[0] > final_range[0] or final_range[0] > bound[1]:
+                    final_range = [bound[0], min(final_range[1], bound[1])]
         return final_range
 
     def ignore_connector(self, data_connector, flag: bool) -> None:
