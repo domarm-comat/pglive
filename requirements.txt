@@ -1,2 +1,2 @@
-numpy==1.26.4 ; python_version >= "3.9" and python_version < "3.13"
+numpy==2.0.2 ; python_version >= "3.9" and python_version < "3.13"
 pyqtgraph==0.13.7 ; python_version >= "3.9" and python_version < "3.13"

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pglive"
-version = "0.8.2"
+version = "0.8.3"
 description = "Live plot for PyqtGraph"
 authors = ["Martin Domaracky <domarm@comat.sk>"]
 license = "MIT"
@@ -20,7 +20,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.9, <3.13"
 pyqtgraph = "^0.13.3"
-numpy = "^1.26.0"
+numpy = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.0.1"
